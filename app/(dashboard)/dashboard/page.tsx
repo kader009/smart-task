@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, Users, CheckSquare, ArrowRightLeft } from 'lucide-react';
+import { Users, CheckSquare, ArrowRightLeft } from 'lucide-react';
 import clsx from 'clsx';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface DashboardData {
   totalProjects: number;
@@ -64,25 +65,27 @@ export default function DashboardPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">Loading...</div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!data) {
-    return <div>Error loading dashboard.</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-red-400 bg-red-500/10 border border-red-500/50 rounded-lg p-4">
+          Error loading dashboard.
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
+        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
         <button
           onClick={handleReassign}
           disabled={reassigning}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all duration-200 shadow-lg"
         >
           <ArrowRightLeft size={20} />
           {reassigning ? 'Reassigning...' : 'Reassign Tasks'}
@@ -91,48 +94,40 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-xl">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
+            <div className="p-3 bg-blue-500/20 text-blue-400 rounded-lg">
               <FolderKanbanIcon />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Total Projects
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Total Projects</p>
+              <p className="text-2xl font-bold text-white">
                 {data.totalProjects}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 shadow-xl">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-lg">
+            <div className="p-3 bg-green-500/20 text-green-400 rounded-lg">
               <CheckSquare size={24} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Total Tasks
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {data.totalTasks}
-              </p>
+              <p className="text-sm text-gray-400">Total Tasks</p>
+              <p className="text-2xl font-bold text-white">{data.totalTasks}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 shadow-xl">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 text-purple-600 rounded-lg">
+            <div className="p-3 bg-purple-500/20 text-purple-400 rounded-lg">
               <Users size={24} />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Team Members
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-400">Team Members</p>
+              <p className="text-2xl font-bold text-white">
                 {data.memberStats.length}
               </p>
             </div>
@@ -142,11 +137,9 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Team Workload */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Team Workload
-            </h2>
+        <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
+          <div className="p-6 border-b border-gray-700/50">
+            <h2 className="text-lg font-semibold text-white">Team Workload</h2>
           </div>
           <div className="p-6 space-y-4">
             {data.memberStats.map((member: any) => (
@@ -155,14 +148,12 @@ export default function DashboardPage() {
                 className="flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 font-medium">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium shadow-lg">
                     {member.name.charAt(0)}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {member.name}
-                    </p>
-                    <p className="text-xs text-gray-500">{member.role}</p>
+                    <p className="font-medium text-white">{member.name}</p>
+                    <p className="text-xs text-gray-400">{member.role}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -171,18 +162,18 @@ export default function DashboardPage() {
                       className={clsx(
                         'font-bold',
                         member.currentLoad > member.capacity
-                          ? 'text-red-500'
-                          : 'text-gray-900 dark:text-white'
+                          ? 'text-red-400'
+                          : 'text-white'
                       )}
                     >
                       {member.currentLoad}
                     </span>
-                    <span className="text-gray-400"> / {member.capacity}</span>
+                    <span className="text-gray-500"> / {member.capacity}</span>
                   </div>
-                  <div className="w-24 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-24 h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div
                       className={clsx(
-                        'h-full rounded-full',
+                        'h-full rounded-full transition-all duration-300',
                         member.currentLoad > member.capacity
                           ? 'bg-red-500'
                           : 'bg-green-500'
@@ -199,7 +190,7 @@ export default function DashboardPage() {
               </div>
             ))}
             {data.memberStats.length === 0 && (
-              <p className="text-gray-500 text-center py-4">
+              <p className="text-gray-400 text-center py-4">
                 No team members found.
               </p>
             )}
@@ -207,9 +198,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Activity Log */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
+          <div className="p-6 border-b border-gray-700/50">
+            <h2 className="text-lg font-semibold text-white">
               Recent Activity
             </h2>
           </div>
@@ -218,12 +209,10 @@ export default function DashboardPage() {
               {data.recentLogs.map((log: any) => (
                 <div key={log._id} className="flex gap-4">
                   <div className="mt-1">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 ring-4 ring-indigo-100 dark:ring-indigo-900/30" />
+                    <div className="w-2 h-2 rounded-full bg-indigo-500 ring-4 ring-indigo-500/20" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-900 dark:text-gray-200">
-                      {log.message}
-                    </p>
+                    <p className="text-sm text-gray-200">{log.message}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(log.createdAt).toLocaleString()}
                     </p>
@@ -231,7 +220,7 @@ export default function DashboardPage() {
                 </div>
               ))}
               {data.recentLogs.length === 0 && (
-                <p className="text-gray-500 text-center py-4">
+                <p className="text-gray-400 text-center py-4">
                   No activity logs yet.
                 </p>
               )}

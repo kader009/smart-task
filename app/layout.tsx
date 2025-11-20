@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import { Toaster } from 'sonner';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -8,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Smart Task Manager',
+  title: 'Taskify',
   description: 'Manage your projects and teams efficiently',
 };
 
@@ -19,7 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={`${inter.className} min-h-screen bg-black text-white antialiased`}
+      >
+        {children}
+        <Toaster position="top-right" richColors />
+      </body>
     </html>
   );
 }

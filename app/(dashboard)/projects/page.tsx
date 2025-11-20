@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import {
   Plus,
   Filter,
-  Calendar,
   User as UserIcon,
   AlertCircle,
   Trash2,
