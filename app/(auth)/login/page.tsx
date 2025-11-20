@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Layers, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAppDispatch } from '@/store/hooks';
+import { setUser } from '@/store/slices/authSlice';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +30,15 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        
+        // Set user in Redux store
+        dispatch(setUser({
+          id: data.userId,
+          name: data.name,
+          email: data.email,
+        }));
+        
         toast.success('Login successful!', {
           description: 'Redirecting to dashboard...',
         });
@@ -57,7 +69,7 @@ export default function LoginPage() {
         <div className="w-full md:w-1/2 bg-[#192233]/50 p-8 md:p-12 flex flex-col justify-center items-center md:items-start text-center md:text-left">
           <div className="flex items-center gap-3 mb-6">
             <Layers className="text-indigo-500 w-10 h-10" />
-            <span className="text-2xl font-bold text-white">ProjectFlow</span>
+            <span className="text-2xl font-bold text-white">Taskify</span>
           </div>
           <h1 className="text-white tracking-tight text-4xl font-bold leading-tight mb-4">
             Welcome Back
