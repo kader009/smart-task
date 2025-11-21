@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Layers, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAppSelector } from '@/store/hooks';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -15,6 +16,14 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAppSelector((state) => state.auth);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Layers, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { useAppDispatch } from '@/store/hooks';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
 
 export default function LoginPage() {
@@ -16,6 +16,14 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,14 +39,16 @@ export default function LoginPage() {
 
       if (res.ok) {
         const data = await res.json();
-        
+
         // Set user in Redux store
-        dispatch(setUser({
-          id: data.userId,
-          name: data.name,
-          email: data.email,
-        }));
-        
+        dispatch(
+          setUser({
+            id: data.userId,
+            name: data.name,
+            email: data.email,
+          })
+        );
+
         toast.success('Login successful!', {
           description: 'Redirecting to dashboard...',
         });
