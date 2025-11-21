@@ -56,7 +56,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="relative z-10 w-64 bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl hidden md:flex flex-col">
+    <aside className="relative z-10 w-64 h-screen bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl hidden md:flex flex-col">
       {/* Logo Section */}
       <div className="p-6 border-b border-gray-700/30">
         <div className="flex items-center gap-3">
@@ -117,7 +117,7 @@ export default function Sidebar() {
         {user && (
           <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-lg">
+              <div className="w-10 h-10 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg">
                 {user.name.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">

@@ -72,7 +72,7 @@ export default function DashboardPage() {
   ).length;
 
   return (
-    <main className="flex-1 p-6 lg:p-10">
+    <main className="flex-1 p-4 lg:p-6">
       <div className="max-w-7xl mx-auto">
         {/* PageHeading */}
         <div className="flex flex-wrap justify-between gap-3 mb-8">
@@ -249,17 +249,32 @@ export default function DashboardPage() {
                   {data.recentLogs.map((log: any) => (
                     <div
                       key={log._id}
-                      className="grid grid-cols-4 gap-4 items-center px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
+                      className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
                     >
-                      <p className="font-medium text-white col-span-3 text-sm truncate">
+                      <p className="font-medium text-white col-span-3 text-sm break-words">
                         {log.message}
                       </p>
-                      <p className="text-right text-gray-400 text-sm">
-                        {new Date(log.createdAt).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </p>
+                      <div className="text-right text-gray-400 text-xs">
+                        <p>
+                          {new Date(log.createdAt).toLocaleTimeString(
+                            undefined,
+                            {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            }
+                          )}
+                        </p>
+                        <p className="text-gray-500">
+                          {new Date(log.createdAt).toLocaleDateString(
+                            undefined,
+                            {
+                              month: 'short',
+                              day: 'numeric',
+                            }
+                          )}
+                        </p>
+                      </div>
                     </div>
                   ))}
                   {data.recentLogs.length === 0 && (

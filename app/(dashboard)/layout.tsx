@@ -15,7 +15,7 @@ export default function DashboardLayout({
   return (
     <ProtectedRoute>
       <div
-        className={`${inter.className} relative flex min-h-screen overflow-hidden`}
+        className={`${inter.className} relative flex h-screen overflow-hidden`}
       >
         {/* Animated gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
@@ -31,9 +31,7 @@ export default function DashboardLayout({
         <Sidebar />
 
         {/* Main Content */}
-        <main className="relative z-10 flex-1 p-8 overflow-y-auto">
-          {children}
-        </main>
+        <main className="relative z-10 flex-1 overflow-y-auto">{children}</main>
       </div>
     </ProtectedRoute>
   );

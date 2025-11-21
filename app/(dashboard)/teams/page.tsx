@@ -135,10 +135,6 @@ export default function TeamsPage() {
   const handleDeleteMember = async (memberId: string, memberName: string) => {
     if (!selectedTeam) return;
 
-    if (!confirm(`Are you sure you want to remove ${memberName} from the team?`)) {
-      return;
-    }
-
     try {
       const res = await fetch(`/api/teams/${selectedTeam._id}/members/${memberId}`, {
         method: 'DELETE',
