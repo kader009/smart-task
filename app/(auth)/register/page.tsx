@@ -72,10 +72,6 @@ export default function RegisterPage() {
       <div className="w-full max-w-4xl overflow-hidden rounded-xl bg-[#111722] shadow-2xl flex flex-col md:flex-row">
         {/* Left Side - Branding */}
         <div className="w-full md:w-1/2 bg-[#192233]/50 p-8 md:p-12 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-          <div className="flex items-center gap-3 mb-6">
-            <Layers className="text-indigo-500 w-10 h-10" />
-            <span className="text-2xl font-bold text-white">ProjectFlow</span>
-          </div>
           <h1 className="text-white tracking-tight text-4xl font-bold leading-tight mb-4">
             Streamline Your Workflow
           </h1>
@@ -93,7 +89,7 @@ export default function RegisterPage() {
                 Create an Account
               </h2>
               <p className="text-[#92a4c9] mb-6">
-                Start your journey with ProjectFlow.
+                Start your journey with Taskify.
               </p>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">

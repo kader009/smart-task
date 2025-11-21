@@ -6,8 +6,6 @@ import { toast } from 'sonner';
 
 import { Team, Member } from '@/app/types';
 
-// Local interfaces removed in favor of shared types
-
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
@@ -153,7 +151,7 @@ export default function TeamsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4 lg:p-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Teams & Members</h1>
         <button
@@ -300,7 +298,7 @@ export default function TeamsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+                  className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
                 >
                   Create Team
                 </button>
@@ -382,7 +380,7 @@ export default function TeamsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+                  className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
                 >
                   Add Member
                 </button>

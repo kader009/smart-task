@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layers, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
@@ -77,10 +77,6 @@ export default function LoginPage() {
       <div className="w-full max-w-4xl overflow-hidden rounded-xl bg-[#111722] shadow-2xl flex flex-col md:flex-row">
         {/* Left Side - Branding */}
         <div className="w-full md:w-1/2 bg-[#192233]/50 p-8 md:p-12 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-          <div className="flex items-center gap-3 mb-6">
-            <Layers className="text-indigo-500 w-10 h-10" />
-            <span className="text-2xl font-bold text-white">Taskify</span>
-          </div>
           <h1 className="text-white tracking-tight text-4xl font-bold leading-tight mb-4">
             Welcome Back
           </h1>

@@ -90,9 +90,6 @@ export default function Sidebar() {
         {/* Logo Section */}
         <div className="p-6 border-b border-gray-700/30">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg shadow-indigo-500/20">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
             <div>
               <h1 className="text-xl font-bold text-white">Taskify</h1>
               <p className="text-xs text-gray-500">Project Manager</p>
@@ -116,7 +113,7 @@ export default function Sidebar() {
                   group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                   ${
                     isActive
-                      ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-white border border-indigo-500/30 shadow-lg shadow-indigo-500/10'
+                      ? 'bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
                   }
                 `}
@@ -127,15 +124,12 @@ export default function Sidebar() {
                     transition-all duration-200
                     ${
                       isActive
-                        ? 'text-indigo-400'
+                        ? 'text-white'
                         : 'text-gray-500 group-hover:text-indigo-400'
                     }
                   `}
                 />
                 <span className="font-medium">{item.name}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                )}
               </Link>
             );
           })}
