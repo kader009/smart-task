@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, UserPlus, Trash2 } from 'lucide-react';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { toast } from 'sonner';
 
 interface Team {
   _id: string;
@@ -21,14 +21,13 @@ export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Forms
   const [newTeamName, setNewTeamName] = useState('');
   const [newMember, setNewMember] = useState({
     name: '',
     role: '',
-    capacity: 3,
+    capacity: 5,
   });
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
@@ -57,8 +56,6 @@ export default function TeamsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch teams', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -88,9 +85,19 @@ export default function TeamsPage() {
         setSelectedTeam(team);
         setNewTeamName('');
         setShowTeamModal(false);
+        toast.success('Team created successfully!', {
+          description: `${team.name} has been created.`,
+        });
+      } else {
+        toast.error('Failed to create team', {
+          description: 'Please try again later.',
+        });
       }
     } catch (error) {
       console.error('Failed to create team', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to create team.',
+      });
     }
   };
 
@@ -107,15 +114,53 @@ export default function TeamsPage() {
       if (res.ok) {
         const member = await res.json();
         setMembers([...members, member]);
-        setNewMember({ name: '', role: '', capacity: 3 });
+        setNewMember({ name: '', role: '', capacity: 5 });
         setShowMemberModal(false);
+        toast.success('Member added successfully!', {
+          description: `${member.name} has been added to the team.`,
+        });
+      } else {
+        toast.error('Failed to add member', {
+          description: 'Please try again later.',
+        });
       }
     } catch (error) {
       console.error('Failed to add member', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to add member.',
+      });
     }
   };
 
-  if (loading) return <LoadingSpinner />;
+  const handleDeleteMember = async (memberId: string, memberName: string) => {
+    if (!selectedTeam) return;
+
+    if (!confirm(`Are you sure you want to remove ${memberName} from the team?`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/teams/${selectedTeam._id}/members/${memberId}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        setMembers(members.filter((m) => m._id !== memberId));
+        toast.success('Member removed successfully!', {
+          description: `${memberName} has been removed from the team.`,
+        });
+      } else {
+        toast.error('Failed to remove member', {
+          description: 'Please try again later.',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to delete member', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to remove member.',
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -125,10 +170,10 @@ export default function TeamsPage() {
         </h1>
         <button
           onClick={() => setShowTeamModal(true)}
-          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 shadow-lg"
+          className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
         >
-          <Plus size={20} />
-          Create Team
+          <Plus size={16} />
+          <span className="truncate">Create Team</span>
         </button>
       </div>
 
@@ -208,7 +253,10 @@ export default function TeamsPage() {
                             </span>
                           </td>
                           <td className="py-4">
-                            <button className="text-red-400 hover:text-red-300 transition-colors">
+                            <button 
+                              onClick={() => handleDeleteMember(member._id, member.name)}
+                              className="text-red-400 hover:text-red-300 transition-colors"
+                            >
                               <Trash2 size={18} />
                             </button>
                           </td>

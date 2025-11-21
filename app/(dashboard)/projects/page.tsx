@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, ChevronDown, Wand2 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface Project {
   _id: string;
@@ -41,7 +40,6 @@ export default function ProjectsPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
-  const [loading, setLoading] = useState(true);
 
   // Forms
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -103,8 +101,6 @@ export default function ProjectsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch projects', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -331,8 +327,6 @@ export default function ProjectsPage() {
       (task.assignedTo && task.assignedTo._id === memberFilter);
     return matchesSearch && matchesStatus && matchesPriority && matchesMember;
   });
-
-  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="space-y-6">

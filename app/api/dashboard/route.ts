@@ -22,16 +22,17 @@ export async function GET(req: Request) {
     let teamIds: any[] = [];
     if (teamId) {
       const team = await Team.findOne({ _id: teamId, owner: user.userId });
-      if (!team) return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+      if (!team)
+        return NextResponse.json({ error: 'Team not found' }, { status: 404 });
       teamIds = [team._id];
     } else {
       const teams = await Team.find({ owner: user.userId }).select('_id');
-      teamIds = teams.map(t => t._id);
+      teamIds = teams.map((t) => t._id);
     }
 
     // Projects
     const projects = await Project.find({ teamId: { $in: teamIds } });
-    const projectIds = projects.map(p => p._id);
+    const projectIds = projects.map((p) => p._id);
 
     // Tasks
     const tasks = await Task.find({ projectId: { $in: projectIds } });
@@ -46,24 +47,34 @@ export async function GET(req: Request) {
     const members = await Member.find({ teamId: { $in: teamIds } });
 
     // Calculate load for each member
-    const memberStats = members.map(member => {
-      const memberTasks = tasks.filter(t => 
-        t.assignedTo && t.assignedTo.toString() === member._id.toString() && t.status !== 'Done'
+    const memberStats = members.map((member) => {
+      const memberTasks = tasks.filter(
+        (t) =>
+          t.assignedTo &&
+          t.assignedTo.toString() === member._id.toString() &&
+          t.status !== 'Done'
       );
       return {
         ...member.toObject(),
-        currentLoad: memberTasks.length
+        currentLoad: memberTasks.length,
       };
     });
+
+    const completedTasks = tasks.filter((t) => t.status === 'Done').length;
+    const openTasks = tasks.length - completedTasks;
 
     return NextResponse.json({
       totalProjects: projects.length,
       totalTasks: tasks.length,
+      completedTasks,
+      openTasks,
       recentLogs: logs,
-      memberStats
+      memberStats,
     });
-
   } catch (error) {
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }

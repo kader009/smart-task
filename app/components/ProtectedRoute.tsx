@@ -13,13 +13,13 @@ export default function ProtectedRoute({
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
-  const [isChecking, setIsChecking] = useState(true);
+  const [isInitialCheck, setIsInitialCheck] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
       // If user already exists (from persist or login), we're ready
       if (user) {
-        setIsChecking(false);
+        setIsInitialCheck(false);
         return;
       }
 
@@ -27,10 +27,10 @@ export default function ProtectedRoute({
       if (!loading) {
         try {
           await dispatch(fetchCurrentUser()).unwrap();
-          setIsChecking(false);
+          setIsInitialCheck(false);
         } catch (error) {
           // No valid session, redirect to login
-          setIsChecking(false);
+          setIsInitialCheck(false);
           router.push('/login');
         }
       }
@@ -40,8 +40,8 @@ export default function ProtectedRoute({
     // Only run once on mount
   }, [dispatch, router]);
 
-  // Show loading state while checking auth
-  if (isChecking || loading) {
+  // Only show loading spinner on initial check, not during navigation
+  if (isInitialCheck && !user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
@@ -54,6 +54,6 @@ export default function ProtectedRoute({
     return null;
   }
 
-  // User is authenticated, show children
+  // User is authenticated, show children immediately
   return <>{children}</>;
 }

@@ -1,20 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, CheckSquare, ArrowRightLeft } from 'lucide-react';
+import { ArrowRightLeft, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface DashboardData {
   totalProjects: number;
   totalTasks: number;
+  completedTasks: number;
+  openTasks: number;
   recentLogs: any[];
   memberStats: any[];
 }
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [reassigning, setReassigning] = useState(false);
 
   const fetchData = async () => {
@@ -26,8 +26,6 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -36,12 +34,6 @@ export default function DashboardPage() {
   }, []);
 
   const handleReassign = async () => {
-    // In a real app, we might want to select a specific team.
-    // For now, we'll just trigger it for the first team found or handle it generically if the API supports it.
-    // The current API requires a teamId. Since we don't have a team selector here yet,
-    // we might need to fetch teams first or just pick one from the memberStats if available.
-
-    // Let's assume we want to reassign for the first team available in the stats for this demo.
     if (!data?.memberStats?.length) return;
 
     const teamId = data.memberStats[0].teamId;
@@ -55,7 +47,8 @@ export default function DashboardPage() {
       });
       if (res.ok) {
         await fetchData(); // Refresh data
-        alert('Tasks reassigned successfully!');
+        // You might want to use a toast here instead of alert
+        // alert('Tasks reassigned successfully!');
       }
     } catch (error) {
       console.error('Reassign failed', error);
@@ -63,10 +56,6 @@ export default function DashboardPage() {
       setReassigning(false);
     }
   };
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   if (!data) {
     return (
@@ -78,178 +67,212 @@ export default function DashboardPage() {
     );
   }
 
+  const overloadedMembersCount = data.memberStats.filter(
+    (m) => m.currentLoad > m.capacity
+  ).length;
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-        <button
-          onClick={handleReassign}
-          disabled={reassigning}
-          className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 transition-all duration-200 shadow-lg"
-        >
-          <ArrowRightLeft size={20} />
-          {reassigning ? 'Reassigning...' : 'Reassign Tasks'}
-        </button>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 shadow-xl">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-500/20 text-blue-400 rounded-lg">
-              <FolderKanbanIcon />
-            </div>
-            <div>
-              <p className="text-sm text-gray-400">Total Projects</p>
-              <p className="text-2xl font-bold text-white">
-                {data.totalProjects}
-              </p>
-            </div>
+    <main className="flex-1 p-6 lg:p-10">
+      <div className="max-w-7xl mx-auto">
+        {/* PageHeading */}
+        <div className="flex flex-wrap justify-between gap-3 mb-8">
+          <div className="flex min-w-72 flex-col gap-2">
+            <p className="text-white text-4xl font-black leading-tight tracking-[-0.033em]">
+              Dashboard Overview
+            </p>
+            <p className="text-gray-400 text-base font-normal leading-normal">
+              An overview of projects, tasks, and team workload.
+            </p>
           </div>
         </div>
 
-        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 shadow-xl">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-green-500/20 text-green-400 rounded-lg">
-              <CheckSquare size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-400">Total Tasks</p>
-              <p className="text-2xl font-bold text-white">{data.totalTasks}</p>
-            </div>
+        {/* Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+            <p className="text-gray-400 text-base font-medium leading-normal">
+              Total Active Projects
+            </p>
+            <p className="text-white tracking-light text-3xl font-bold leading-tight">
+              {data.totalProjects}
+            </p>
+            <p className="text-green-400 text-base font-medium leading-normal">
+              +2 this week
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+            <p className="text-gray-400 text-base font-medium leading-normal">
+              Total Open Tasks
+            </p>
+            <p className="text-white tracking-light text-3xl font-bold leading-tight">
+              {data.openTasks}
+            </p>
+            <p className="text-yellow-400 text-base font-medium leading-normal">
+              -5 this week
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+            <p className="text-gray-400 text-base font-medium leading-normal">
+              Tasks Completed
+            </p>
+            <p className="text-white tracking-light text-3xl font-bold leading-tight">
+              {data.completedTasks}
+            </p>
+            <p className="text-green-400 text-base font-medium leading-normal">
+              +10 this week
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+            <p className="text-gray-400 text-base font-medium leading-normal">
+              Overloaded Members
+            </p>
+            <p className="text-white tracking-light text-3xl font-bold leading-tight">
+              {overloadedMembersCount}
+            </p>
+            <p className="text-yellow-400 text-base font-medium leading-normal">
+              +1 this week
+            </p>
           </div>
         </div>
 
-        <div className="bg-gray-800/30 backdrop-blur-xl p-6 rounded-xl border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 shadow-xl">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-purple-500/20 text-purple-400 rounded-lg">
-              <Users size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-400">Team Members</p>
-              <p className="text-2xl font-bold text-white">
-                {data.memberStats.length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Team Workload */}
-        <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
-          <div className="p-6 border-b border-gray-700/50">
-            <h2 className="text-lg font-semibold text-white">Team Workload</h2>
-          </div>
-          <div className="p-6 space-y-4">
-            {data.memberStats.map((member: any) => (
-              <div
-                key={member._id}
-                className="flex items-center justify-between"
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Team Workload Section */}
+          <div className="xl:col-span-2">
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-4">
+              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
+                Team Workload
+              </h2>
+              <button
+                onClick={handleReassign}
+                disabled={reassigning}
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 hover:bg-indigo-700 text-white gap-2 pl-3 text-sm font-bold leading-normal tracking-[0.015em] transition-all disabled:opacity-50"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-medium shadow-lg">
-                    {member.name.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="font-medium text-white">{member.name}</p>
-                    <p className="text-xs text-gray-400">{member.role}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <span
-                      className={clsx(
-                        'font-bold',
-                        member.currentLoad > member.capacity
-                          ? 'text-red-400'
-                          : 'text-white'
-                      )}
-                    >
-                      {member.currentLoad}
-                    </span>
-                    <span className="text-gray-500"> / {member.capacity}</span>
-                  </div>
-                  <div className="w-24 h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div
-                      className={clsx(
-                        'h-full rounded-full transition-all duration-300',
-                        member.currentLoad > member.capacity
-                          ? 'bg-red-500'
-                          : 'bg-green-500'
-                      )}
-                      style={{
-                        width: `${Math.min(
-                          (member.currentLoad / member.capacity) * 100,
-                          100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-            {data.memberStats.length === 0 && (
-              <p className="text-gray-400 text-center py-4">
-                No team members found.
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Activity Log */}
-        <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
-          <div className="p-6 border-b border-gray-700/50">
-            <h2 className="text-lg font-semibold text-white">
-              Recent Activity
-            </h2>
-          </div>
-          <div className="p-6">
-            <div className="space-y-6">
-              {data.recentLogs.map((log: any) => (
-                <div key={log._id} className="flex gap-4">
-                  <div className="mt-1">
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 ring-4 ring-indigo-500/20" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-200">{log.message}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(log.createdAt).toLocaleString()}
+                <RefreshCw
+                  size={16}
+                  className={clsx(reassigning && 'animate-spin')}
+                />
+                <span className="truncate">
+                  {reassigning ? 'Reassigning...' : 'Reassign Tasks'}
+                </span>
+              </button>
+            </div>
+            <div className="bg-gray-800/30 backdrop-blur-xl p-4 rounded-xl border border-gray-700/50">
+              <div className="flex flex-col">
+                {/* Table Header */}
+                <div className="grid grid-cols-6 gap-4 px-4 py-2 border-b border-gray-700/50">
+                  <div className="col-span-2">
+                    <p className="text-sm font-semibold text-gray-400">
+                      Team Member
                     </p>
                   </div>
+                  <div className="col-span-3">
+                    <p className="text-sm font-semibold text-gray-400">
+                      Workload
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-400">Tasks</p>
+                  </div>
                 </div>
-              ))}
-              {data.recentLogs.length === 0 && (
-                <p className="text-gray-400 text-center py-4">
-                  No activity logs yet.
-                </p>
-              )}
+                {/* Table Rows */}
+                <div className="space-y-2 pt-2">
+                  {data.memberStats.map((member: any) => {
+                    const loadPercentage = Math.min(
+                      (member.currentLoad / member.capacity) * 100,
+                      100
+                    );
+                    const isOverloaded = member.currentLoad > member.capacity;
+
+                    return (
+                      <div
+                        key={member._id}
+                        className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 col-span-2">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
+                            {member.name.charAt(0).toUpperCase()}
+                          </div>
+                          <p className="font-medium text-white truncate">
+                            {member.name}
+                          </p>
+                          {isOverloaded && (
+                            <span
+                              className="w-3 h-3 bg-yellow-500 rounded-full shrink-0"
+                              title="Overloaded"
+                            ></span>
+                          )}
+                        </div>
+                        <div className="col-span-3">
+                          <div className="w-full bg-gray-700/50 rounded-full h-2.5">
+                            <div
+                              className={clsx(
+                                'h-2.5 rounded-full transition-all duration-500',
+                                isOverloaded ? 'bg-yellow-500' : 'bg-indigo-500'
+                              )}
+                              style={{ width: `${loadPercentage}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <p className="text-right font-medium text-gray-400">
+                          {member.currentLoad}/{member.capacity}
+                        </p>
+                      </div>
+                    );
+                  })}
+                  {data.memberStats.length === 0 && (
+                    <p className="text-gray-400 text-center py-4">
+                      No team members found.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Recent Reassignments (Activity Log) */}
+          <div className="xl:col-span-1">
+            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">
+              Recent Activity
+            </h2>
+            <div className="bg-gray-800/30 backdrop-blur-xl p-4 rounded-xl border border-gray-700/50">
+              <div className="flex flex-col">
+                {/* Table Header */}
+                <div className="grid grid-cols-4 gap-4 px-4 py-2 border-b border-gray-700/50">
+                  <p className="text-sm col-span-3 font-semibold text-gray-400">
+                    Activity
+                  </p>
+                  <p className="text-sm font-semibold text-gray-400 text-right">
+                    Date
+                  </p>
+                </div>
+                {/* Table Rows */}
+                <div className="space-y-3 pt-2">
+                  {data.recentLogs.map((log: any) => (
+                    <div
+                      key={log._id}
+                      className="grid grid-cols-4 gap-4 items-center px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
+                    >
+                      <p className="font-medium text-white col-span-3 text-sm truncate">
+                        {log.message}
+                      </p>
+                      <p className="text-right text-gray-400 text-sm">
+                        {new Date(log.createdAt).toLocaleDateString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
+                    </div>
+                  ))}
+                  {data.recentLogs.length === 0 && (
+                    <p className="text-gray-400 text-center py-4">
+                      No recent activity.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function FolderKanbanIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className="lucide lucide-folder-kanban"
-    >
-      <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 2H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z" />
-      <path d="M8 10v4" />
-      <path d="M12 10v2" />
-      <path d="M16 10v6" />
-    </svg>
+    </main>
   );
 }

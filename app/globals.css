@@ -10,3 +10,9 @@ html, body {
   background-color: #000;
 }
 
+/* Smooth page transitions */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    view-transition-name: root;
+  }
+}
