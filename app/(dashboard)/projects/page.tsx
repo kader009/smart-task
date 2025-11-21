@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, ChevronDown, Wand2 } from 'lucide-react';
 import clsx from 'clsx';
+import { toast } from 'sonner';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface Project {
@@ -45,6 +46,8 @@ export default function ProjectsPage() {
   // Forms
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newProject, setNewProject] = useState({
     name: '',
     description: '',
@@ -112,7 +115,20 @@ export default function ProjectsPage() {
 
   const fetchTasks = async (projectId: string) => {
     const res = await fetch(`/api/tasks?projectId=${projectId}`);
-    if (res.ok) setTasks(await res.json());
+    if (res.ok) {
+      const tasksData = await res.json();
+      console.log('=== FETCHED TASKS DEBUG ===');
+      console.log('Tasks count:', tasksData.length);
+      console.log('Full tasks data:', tasksData);
+      if (tasksData.length > 0) {
+        console.log('First task:', tasksData[0]);
+        console.log('First task _id:', tasksData[0]._id);
+        console.log('First task _id type:', typeof tasksData[0]._id);
+        console.log('First task keys:', Object.keys(tasksData[0]));
+      }
+      console.log('=========================');
+      setTasks(tasksData);
+    }
   };
 
   const fetchMembers = async (teamId: string) => {
@@ -137,9 +153,19 @@ export default function ProjectsPage() {
         setSelectedProject(project);
         setShowProjectModal(false);
         setNewProject({ name: '', description: '', teamId: '' });
+        toast.success('Project created successfully!', {
+          description: `${project.name} has been added to your projects.`,
+        });
+      } else {
+        toast.error('Failed to create project', {
+          description: 'Please try again later.',
+        });
       }
     } catch (error) {
       console.error('Failed to create project', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to create project.',
+      });
     }
   };
 
@@ -169,9 +195,90 @@ export default function ProjectsPage() {
           assignedTo: '',
         });
         setCapacityWarning(null);
+        toast.success('Task created successfully!', {
+          description: `${task.title} has been added to the project.`,
+        });
+      } else {
+        toast.error('Failed to create task', {
+          description: 'Please try again later.',
+        });
       }
     } catch (error) {
       console.error('Failed to create task', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to create task.',
+      });
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    console.log('Editing task:', task);
+    console.log('Task _id:', task._id);
+    console.log('Task _id type:', typeof task._id);
+    setEditingTask(task);
+    setShowEditTaskModal(true);
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTask) return;
+
+    // Get the task ID - handle both _id and id fields
+    const taskId = editingTask._id || (editingTask as any).id;
+    
+    if (!taskId) {
+      console.error('No task ID found!', editingTask);
+      toast.error('Invalid task', {
+        description: 'Task ID is missing.',
+      });
+      return;
+    }
+
+    try {
+      const payload = {
+        title: editingTask.title,
+        description: editingTask.description,
+        priority: editingTask.priority,
+        status: editingTask.status,
+        assignedTo:
+          typeof editingTask.assignedTo === 'object' && editingTask.assignedTo
+            ? editingTask.assignedTo._id
+            : editingTask.assignedTo,
+      };
+
+      console.log('Updating task with payload:', payload);
+      console.log('Task ID:', taskId);
+
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      console.log('Response status:', res.status);
+      const responseData = await res.json();
+      console.log('Response data:', responseData);
+
+      if (res.ok) {
+        setTasks(
+          tasks.map((t) => (t._id === responseData._id ? responseData : t))
+        );
+        setShowEditTaskModal(false);
+        setEditingTask(null);
+        setCapacityWarning(null);
+        toast.success('Task updated successfully!', {
+          description: `${responseData.title} has been updated.`,
+        });
+      } else {
+        toast.error('Failed to update task', {
+          description: responseData.error || 'Please try again later.',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to update task', error);
+      toast.error('Something went wrong', {
+        description: 'Unable to update task.',
+      });
     }
   };
 
@@ -249,7 +356,7 @@ export default function ProjectsPage() {
           </button>
           <button
             onClick={() => setShowTaskModal(true)}
-            className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-bold leading-normal hover:from-indigo-700 hover:to-purple-700 transition-all"
+            className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
           >
             <Plus size={16} />
             <span className="truncate">Add New Task</span>
@@ -318,7 +425,9 @@ export default function ProjectsPage() {
                   onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
                   className="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-800/50 backdrop-blur-sm px-4 border border-gray-700/50 hover:bg-gray-700/50 text-white"
                 >
-                  <p className="text-sm font-medium">Priority: {priorityFilter}</p>
+                  <p className="text-sm font-medium">
+                    Priority: {priorityFilter}
+                  </p>
                   <ChevronDown size={16} />
                 </button>
                 {showPriorityDropdown && (
@@ -415,7 +524,10 @@ export default function ProjectsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button className="text-indigo-400 hover:text-indigo-300 transition-colors">
+                      <button
+                        onClick={() => handleEditTask(task)}
+                        className="text-indigo-400 hover:text-indigo-300 transition-colors"
+                      >
                         Edit
                       </button>
                     </td>
@@ -519,8 +631,8 @@ export default function ProjectsPage() {
 
       {/* Add Task Modal */}
       {showTaskModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto my-8">
             <h2 className="text-xl font-bold mb-4 text-white">Add New Task</h2>
             <form onSubmit={handleCreateTask} className="space-y-6">
               <div>
@@ -532,7 +644,9 @@ export default function ProjectsPage() {
                   placeholder="e.g., Design homepage"
                   type="text"
                   value={newTask.title}
-                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, title: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -545,7 +659,9 @@ export default function ProjectsPage() {
                   placeholder="Add a more detailed description..."
                   rows={4}
                   value={newTask.description}
-                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, description: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -605,7 +721,9 @@ export default function ProjectsPage() {
                 <select
                   className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   value={newTask.status}
-                  onChange={(e) => setNewTask({ ...newTask, status: e.target.value as any })}
+                  onChange={(e) =>
+                    setNewTask({ ...newTask, status: e.target.value as any })
+                  }
                 >
                   <option value="Pending">Pending</option>
                   <option value="In Progress">In Progress</option>
@@ -629,6 +747,155 @@ export default function ProjectsPage() {
                   className="px-4 py-3 rounded-lg shadow-sm text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
                 >
                   Add Task
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Task Modal */}
+      {showEditTaskModal && editingTask && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto my-8">
+            <h2 className="text-xl font-bold mb-4 text-white">Edit Task</h2>
+            <form onSubmit={handleUpdateTask} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Task Title
+                </label>
+                <input
+                  className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="e.g., Design homepage"
+                  type="text"
+                  value={editingTask.title}
+                  onChange={(e) =>
+                    setEditingTask({ ...editingTask, title: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Description
+                </label>
+                <textarea
+                  className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Add a more detailed description..."
+                  rows={4}
+                  value={editingTask.description}
+                  onChange={(e) =>
+                    setEditingTask({
+                      ...editingTask,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Assign Member
+                </label>
+                <select
+                  className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={
+                    typeof editingTask.assignedTo === 'object' &&
+                    editingTask.assignedTo
+                      ? editingTask.assignedTo._id
+                      : editingTask.assignedTo || ''
+                  }
+                  onChange={(e) => {
+                    const memberId = e.target.value;
+                    const member = members.find((m) => m._id === memberId);
+                    setEditingTask({
+                      ...editingTask,
+                      assignedTo: member
+                        ? { _id: member._id, name: member.name }
+                        : null,
+                    });
+                    if (memberId) checkCapacity(memberId);
+                  }}
+                >
+                  <option value="">Select a member</option>
+                  {members.map((member) => (
+                    <option key={member._id} value={member._id}>
+                      {member.name} (Cap: {member.capacity})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {capacityWarning && (
+                <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-sm text-yellow-300">
+                  <p className="font-semibold mb-2">{capacityWarning}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Priority
+                </label>
+                <div className="flex gap-2">
+                  {['Low', 'Medium', 'High'].map((priority) => (
+                    <button
+                      key={priority}
+                      type="button"
+                      onClick={() =>
+                        setEditingTask({
+                          ...editingTask,
+                          priority: priority as any,
+                        })
+                      }
+                      className={clsx(
+                        'flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all',
+                        editingTask.priority === priority
+                          ? 'border-2 border-indigo-500 bg-indigo-500/20 text-indigo-300'
+                          : 'border border-gray-600 hover:bg-gray-700/50 text-gray-300'
+                      )}
+                    >
+                      {priority}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Status
+                </label>
+                <select
+                  className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={editingTask.status}
+                  onChange={(e) =>
+                    setEditingTask({
+                      ...editingTask,
+                      status: e.target.value as any,
+                    })
+                  }
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Done">Done</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditTaskModal(false);
+                    setEditingTask(null);
+                    setCapacityWarning(null);
+                  }}
+                  className="px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-3 rounded-lg shadow-sm text-sm font-bold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+                >
+                  Update Task
                 </button>
               </div>
             </form>

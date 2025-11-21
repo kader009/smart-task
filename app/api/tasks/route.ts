@@ -38,8 +38,47 @@ export async function POST(req: Request) {
       status,
     });
 
-    return NextResponse.json(task, { status: 201 });
+    // Populate the task before returning
+    const populatedTask: any = await Task.findById(task._id)
+      .populate('assignedTo', 'name')
+      .populate('projectId', 'name')
+      .lean();
+
+    if (!populatedTask) {
+      return NextResponse.json(
+        { error: 'Task not found after creation' },
+        { status: 500 }
+      );
+    }
+
+    // Ensure _id is converted to string
+    const transformedTask = {
+      ...populatedTask,
+      _id: populatedTask._id.toString(),
+      projectId: populatedTask.projectId
+        ? {
+            _id:
+              populatedTask.projectId._id?.toString() ||
+              populatedTask.projectId._id,
+            name: populatedTask.projectId.name,
+          }
+        : populatedTask.projectId,
+      assignedTo: populatedTask.assignedTo
+        ? {
+            _id:
+              populatedTask.assignedTo._id?.toString() ||
+              populatedTask.assignedTo._id,
+            name: populatedTask.assignedTo.name,
+          }
+        : populatedTask.assignedTo,
+    };
+
+    console.log('Created task:', transformedTask);
+    console.log('Created task _id type:', typeof transformedTask._id);
+
+    return NextResponse.json(transformedTask, { status: 201 });
   } catch (error) {
+    console.error('Task creation error:', error);
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
@@ -90,84 +129,34 @@ export async function GET(req: Request) {
 
     const tasks = await Task.find(query)
       .populate('assignedTo', 'name')
-      .populate('projectId', 'name');
+      .populate('projectId', 'name')
+      .lean();
 
-    return NextResponse.json(tasks);
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
-  }
-}
+    // Ensure _id is converted to string
+    const transformedTasks = tasks.map((task: any) => ({
+      ...task,
+      _id: task._id.toString(),
+      projectId: task.projectId
+        ? {
+            _id: task.projectId._id?.toString() || task.projectId._id,
+            name: task.projectId.name,
+          }
+        : task.projectId,
+      assignedTo: task.assignedTo
+        ? {
+            _id: task.assignedTo._id?.toString() || task.assignedTo._id,
+            name: task.assignedTo.name,
+          }
+        : task.assignedTo,
+    }));
 
-export async function PUT(req: Request) {
-  try {
-    const user = await getUserFromToken();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.log('Fetched tasks count:', transformedTasks.length);
+    if (transformedTasks.length > 0) {
+      console.log('Sample task:', transformedTasks[0]);
+      console.log('Sample task _id type:', typeof transformedTasks[0]._id);
     }
 
-    await dbConnect();
-    const { id, ...updateData } = await req.json();
-
-    // Verify ownership
-    const task = await Task.findById(id).populate('projectId');
-    if (!task)
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
-
-    // Check if project belongs to a team owned by user
-    // We need to fetch the project to get teamId
-    const project = await Project.findById(task.projectId);
-    const team = await Team.findOne({
-      _id: project.teamId,
-      owner: user.userId,
-    });
-
-    if (!team) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-
-    const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
-    return NextResponse.json(updatedTask);
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
-    const user = await getUserFromToken();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get('id');
-
-    await dbConnect();
-
-    const task = await Task.findById(id);
-    if (!task)
-      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
-
-    const project = await Project.findById(task.projectId);
-    const team = await Team.findOne({
-      _id: project.teamId,
-      owner: user.userId,
-    });
-
-    if (!team) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
-    }
-
-    await Task.findByIdAndDelete(id);
-    return NextResponse.json({ message: 'Task deleted' });
+    return NextResponse.json(transformedTasks);
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },
