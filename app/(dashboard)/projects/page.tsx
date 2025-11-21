@@ -1,11 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, ChevronDown, Wand2 } from 'lucide-react';
-import clsx from 'clsx';
+import { Plus, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Project, Task, Team, Member } from '@/app/types';
+import CreateProjectModal from '@/app/components/projects/CreateProjectModal';
+import CreateTaskModal from '@/app/components/projects/CreateTaskModal';
+import EditTaskModal from '@/app/components/projects/EditTaskModal';
+import TaskTable from '@/app/components/projects/TaskTable';
+import TaskFilters from '@/app/components/projects/TaskFilters';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -341,542 +345,64 @@ export default function ProjectsPage() {
 
         <div>
           {/* Task List */}
-          <div>
-            {/* Search and Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-4">
-              {/* SearchBar */}
-              <div className="flex-grow">
-                <div className="flex w-full h-12 rounded-lg overflow-hidden">
-                  <div className="flex items-center justify-center px-4 bg-gray-800/50 backdrop-blur-sm border border-r-0 border-gray-700/50 text-gray-400">
-                    <Search size={20} />
-                  </div>
-                  <input
-                    className="flex-1 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white placeholder:text-gray-400 focus:outline-none"
-                    placeholder="Search by task title..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </div>
-              {/* Filters */}
-              <div className="flex items-center gap-3">
-                {/* Status Filter */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                    className="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-800/50 backdrop-blur-sm px-4 border border-gray-700/50 hover:bg-gray-700/50 text-white"
-                  >
-                    <p className="text-sm font-medium">
-                      Status: {statusFilter}
-                    </p>
-                    <ChevronDown size={16} />
-                  </button>
-                  {showStatusDropdown && (
-                    <div className="absolute top-full mt-2 right-0 bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-lg shadow-xl z-10 min-w-[150px]">
-                      {['All', 'Pending', 'In Progress', 'Done'].map(
-                        (status) => (
-                          <button
-                            key={status}
-                            onClick={() => {
-                              setStatusFilter(status);
-                              setShowStatusDropdown(false);
-                            }}
-                            className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700/50 first:rounded-t-lg last:rounded-b-lg"
-                          >
-                            {status}
-                          </button>
-                        )
-                      )}
-                    </div>
-                  )}
-                </div>
+          <TaskFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            priorityFilter={priorityFilter}
+            setPriorityFilter={setPriorityFilter}
+            showStatusDropdown={showStatusDropdown}
+            setShowStatusDropdown={setShowStatusDropdown}
+            showPriorityDropdown={showPriorityDropdown}
+            setShowPriorityDropdown={setShowPriorityDropdown}
+          />
 
-                {/* Priority Filter */}
-                <div className="relative">
-                  <button
-                    onClick={() =>
-                      setShowPriorityDropdown(!showPriorityDropdown)
-                    }
-                    className="flex h-12 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-gray-800/50 backdrop-blur-sm px-4 border border-gray-700/50 hover:bg-gray-700/50 text-white"
-                  >
-                    <p className="text-sm font-medium">
-                      Priority: {priorityFilter}
-                    </p>
-                    <ChevronDown size={16} />
-                  </button>
-                  {showPriorityDropdown && (
-                    <div className="absolute top-full mt-2 right-0 bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 rounded-lg shadow-xl z-10 min-w-[150px]">
-                      {['All', 'Low', 'Medium', 'High'].map((priority) => (
-                        <button
-                          key={priority}
-                          onClick={() => {
-                            setPriorityFilter(priority);
-                            setShowPriorityDropdown(false);
-                          }}
-                          className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700/50 first:rounded-t-lg last:rounded-b-lg"
-                        >
-                          {priority}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-gray-800/30 backdrop-blur-xl">
-              <table className="min-w-full divide-y divide-gray-700/50">
-                <thead className="bg-gray-900/50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-2/5">
-                      Task Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Assigned To
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Priority
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="relative px-6 py-3">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700/50">
-                  {filteredTasks.map((task) => (
-                    <tr
-                      key={task._id}
-                      className="hover:bg-gray-700/20 transition-colors"
-                    >
-                      <td className="px-6 py-4 text-sm font-medium text-white">
-                        {task.title}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold text-xs">
-                            {task.assignedTo
-                              ? task.assignedTo.name.charAt(0).toUpperCase()
-                              : 'U'}
-                          </div>
-                          <span className="text-sm text-gray-300">
-                            {task.assignedTo
-                              ? task.assignedTo.name
-                              : 'Unassigned'}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={clsx(
-                            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                            task.priority === 'High'
-                              ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                              : task.priority === 'Medium'
-                              ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30'
-                              : 'bg-green-500/20 text-green-300 border border-green-500/30'
-                          )}
-                        >
-                          {task.priority}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={clsx(
-                            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-                            task.status === 'Done'
-                              ? 'bg-green-500/20 text-green-300 border border-green-500/30'
-                              : task.status === 'In Progress'
-                              ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
-                              : 'bg-gray-500/20 text-gray-300 border border-gray-500/30'
-                          )}
-                        >
-                          {task.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => handleEditTask(task)}
-                          className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                        >
-                          Edit
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredTasks.length === 0 && (
-                    <tr>
-                      <td
-                        colSpan={5}
-                        className="px-6 py-8 text-center text-gray-400"
-                      >
-                        No tasks found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          {/* Table */}
+          <TaskTable tasks={filteredTasks} onEdit={handleEditTask} />
         </div>
 
         {/* Create Project Modal */}
-        {showProjectModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl">
-              <h2 className="text-xl font-bold mb-4 text-white">
-                Create New Project
-              </h2>
-              <form onSubmit={handleCreateProject}>
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Project Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={newProject.name}
-                      onChange={(e) =>
-                        setNewProject({ ...newProject, name: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border rounded-lg bg-gray-700/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      value={newProject.description}
-                      onChange={(e) =>
-                        setNewProject({
-                          ...newProject,
-                          description: e.target.value,
-                        })
-                      }
-                      className="w-full px-3 py-2 border rounded-lg bg-gray-700/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1">
-                      Team
-                    </label>
-                    <select
-                      required
-                      value={newProject.teamId}
-                      onChange={(e) =>
-                        setNewProject({ ...newProject, teamId: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border rounded-lg bg-gray-700/50 border-gray-600/50 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <option value="">Select a team</option>
-                      {teams.map((team) => (
-                        <option key={team._id} value={team._id}>
-                          {team.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="flex justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setShowProjectModal(false)}
-                    className="px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white rounded-lg hover:bg-gray-700/50 transition-all font-bold"
-                  >
-                    Create Project
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <CreateProjectModal
+          isOpen={showProjectModal}
+          onClose={() => setShowProjectModal(false)}
+          onSubmit={handleCreateProject}
+          newProject={newProject}
+          setNewProject={setNewProject}
+          teams={teams}
+        />
 
         {/* Add Task Modal */}
-        {showTaskModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto my-8">
-              <h2 className="text-xl font-bold mb-4 text-white">
-                Add New Task
-              </h2>
-              <form onSubmit={handleCreateTask} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Task Title
-                  </label>
-                  <input
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., Design homepage"
-                    type="text"
-                    value={newTask.title}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, title: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Add a more detailed description..."
-                    rows={4}
-                    value={newTask.description}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, description: e.target.value })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Assign Member
-                  </label>
-                  <select
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={newTask.assignedTo}
-                    onChange={(e) => {
-                      setNewTask({ ...newTask, assignedTo: e.target.value });
-                      checkCapacity(e.target.value);
-                    }}
-                  >
-                    <option value="">Select a member</option>
-                    {members.map((member) => (
-                      <option key={member._id} value={member._id}>
-                        {member.name} (Cap: {member.capacity})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {capacityWarning && (
-                  <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-sm text-yellow-300">
-                    <p className="font-semibold mb-2">{capacityWarning}</p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Priority
-                  </label>
-                  <div className="flex gap-2">
-                    {['Low', 'Medium', 'High'].map((priority) => (
-                      <button
-                        key={priority}
-                        type="button"
-                        onClick={() => setNewTask({ ...newTask, priority })}
-                        className={clsx(
-                          'flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all',
-                          newTask.priority === priority
-                            ? 'border-2 border-indigo-500 bg-indigo-500/20 text-indigo-300'
-                            : 'border border-gray-600 hover:bg-gray-700/50 text-gray-300'
-                        )}
-                      >
-                        {priority}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Status
-                  </label>
-                  <select
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={newTask.status}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, status: e.target.value as any })
-                    }
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowTaskModal(false);
-                      setCapacityWarning(null);
-                    }}
-                    className="px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white rounded-lg hover:bg-gray-700/50 transition-all font-bold"
-                  >
-                    Add Task
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        <CreateTaskModal
+          isOpen={showTaskModal}
+          onClose={() => {
+            setShowTaskModal(false);
+            setCapacityWarning(null);
+          }}
+          onSubmit={handleCreateTask}
+          newTask={newTask}
+          setNewTask={setNewTask}
+          members={members}
+          capacityWarning={capacityWarning}
+          checkCapacity={checkCapacity}
+        />
 
         {/* Edit Task Modal */}
-        {showEditTaskModal && editingTask && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-gray-800/90 backdrop-blur-xl border border-gray-700/50 p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto my-8">
-              <h2 className="text-xl font-bold mb-4 text-white">Edit Task</h2>
-              <form onSubmit={handleUpdateTask} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Task Title
-                  </label>
-                  <input
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., Design homepage"
-                    type="text"
-                    value={editingTask.title}
-                    onChange={(e) =>
-                      setEditingTask({ ...editingTask, title: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white placeholder:text-gray-400 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Add a more detailed description..."
-                    rows={4}
-                    value={editingTask.description}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        description: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Assign Member
-                  </label>
-                  <select
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={
-                      typeof editingTask.assignedTo === 'object' &&
-                      editingTask.assignedTo
-                        ? editingTask.assignedTo._id
-                        : editingTask.assignedTo || ''
-                    }
-                    onChange={(e) => {
-                      const memberId = e.target.value;
-                      const member = members.find((m) => m._id === memberId);
-                      setEditingTask({
-                        ...editingTask,
-                        assignedTo: member
-                          ? { _id: member._id, name: member.name }
-                          : null,
-                      });
-                      if (memberId) checkCapacity(memberId);
-                    }}
-                  >
-                    <option value="">Select a member</option>
-                    {members.map((member) => (
-                      <option key={member._id} value={member._id}>
-                        {member.name} (Cap: {member.capacity})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {capacityWarning && (
-                  <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-sm text-yellow-300">
-                    <p className="font-semibold mb-2">{capacityWarning}</p>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Priority
-                  </label>
-                  <div className="flex gap-2">
-                    {['Low', 'Medium', 'High'].map((priority) => (
-                      <button
-                        key={priority}
-                        type="button"
-                        onClick={() =>
-                          setEditingTask({
-                            ...editingTask,
-                            priority: priority as any,
-                          })
-                        }
-                        className={clsx(
-                          'flex-1 py-2 px-4 rounded-lg text-sm font-semibold transition-all',
-                          editingTask.priority === priority
-                            ? 'border-2 border-indigo-500 bg-indigo-500/20 text-indigo-300'
-                            : 'border border-gray-600 hover:bg-gray-700/50 text-gray-300'
-                        )}
-                      >
-                        {priority}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Status
-                  </label>
-                  <select
-                    className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={editingTask.status}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        status: e.target.value as any,
-                      })
-                    }
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                  </select>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowEditTaskModal(false);
-                      setEditingTask(null);
-                      setCapacityWarning(null);
-                    }}
-                    className="px-4 py-2 text-gray-300 hover:bg-gray-700/50 rounded-lg transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white rounded-lg hover:bg-gray-700/50 transition-all font-bold"
-                  >
-                    Update Task
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+        {editingTask && (
+          <EditTaskModal
+            isOpen={showEditTaskModal}
+            onClose={() => {
+              setShowEditTaskModal(false);
+              setEditingTask(null);
+              setCapacityWarning(null);
+            }}
+            onSubmit={handleUpdateTask}
+            editingTask={editingTask}
+            setEditingTask={setEditingTask}
+            members={members}
+            capacityWarning={capacityWarning}
+            checkCapacity={checkCapacity}
+          />
         )}
       </div>
     </div>

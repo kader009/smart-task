@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface Team {
   _id: string;
   name: string;
@@ -36,4 +38,67 @@ export interface DashboardData {
   openTasks: number;
   recentLogs: any[];
   memberStats: any[];
+}
+
+export interface CreateProjectModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  newProject: {
+    name: string;
+    description: string;
+    teamId: string;
+  };
+  setNewProject: (project: {
+    name: string;
+    description: string;
+    teamId: string;
+  }) => void;
+  teams: Team[];
+}
+
+export interface CreateTaskModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  newTask: {
+    title: string;
+    description: string;
+    priority: string;
+    status: string;
+    assignedTo: string;
+  };
+  setNewTask: (task: any) => void;
+  members: Member[];
+  capacityWarning: string | null;
+  checkCapacity: (memberId: string) => void;
+}
+
+export interface EditTaskModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+  editingTask: Task;
+  setEditingTask: (task: Task) => void;
+  members: Member[];
+  capacityWarning: string | null;
+  checkCapacity: (memberId: string) => void;
+}
+
+export interface TaskFiltersProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  priorityFilter: string;
+  setPriorityFilter: (priority: string) => void;
+  showStatusDropdown: boolean;
+  setShowStatusDropdown: (show: boolean) => void;
+  showPriorityDropdown: boolean;
+  setShowPriorityDropdown: (show: boolean) => void;
+}
+
+export interface TaskTableProps {
+  tasks: Task[];
+  onEdit: (task: Task) => void;
 }
