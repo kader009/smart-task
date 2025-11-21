@@ -4,18 +4,9 @@ import { useState, useEffect } from 'react';
 import { Plus, UserPlus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface Team {
-  _id: string;
-  name: string;
-}
+import { Team, Member } from '@/app/types';
 
-interface Member {
-  _id: string;
-  name: string;
-  role: string;
-  capacity: number;
-  teamId: string;
-}
+// Local interfaces removed in favor of shared types
 
 export default function TeamsPage() {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -136,9 +127,12 @@ export default function TeamsPage() {
     if (!selectedTeam) return;
 
     try {
-      const res = await fetch(`/api/teams/${selectedTeam._id}/members/${memberId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(
+        `/api/teams/${selectedTeam._id}/members/${memberId}`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (res.ok) {
         setMembers(members.filter((m) => m._id !== memberId));
@@ -161,9 +155,7 @@ export default function TeamsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">
-          Teams & Members
-        </h1>
+        <h1 className="text-2xl font-bold text-white">Teams & Members</h1>
         <button
           onClick={() => setShowTeamModal(true)}
           className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
@@ -176,9 +168,7 @@ export default function TeamsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {/* Team List */}
         <div className="md:col-span-1 space-y-2">
-          <h2 className="font-semibold text-gray-300 mb-4">
-            Your Teams
-          </h2>
+          <h2 className="font-semibold text-gray-300 mb-4">Your Teams</h2>
           {teams.map((team) => (
             <button
               key={team._id}
@@ -220,12 +210,8 @@ export default function TeamsPage() {
                   <table className="w-full text-left">
                     <thead>
                       <tr className="border-b border-gray-700/50">
-                        <th className="pb-3 font-medium text-gray-400">
-                          Name
-                        </th>
-                        <th className="pb-3 font-medium text-gray-400">
-                          Role
-                        </th>
+                        <th className="pb-3 font-medium text-gray-400">Name</th>
+                        <th className="pb-3 font-medium text-gray-400">Role</th>
                         <th className="pb-3 font-medium text-gray-400">
                           Capacity
                         </th>
@@ -240,17 +226,17 @@ export default function TeamsPage() {
                           <td className="py-4 text-white font-medium">
                             {member.name}
                           </td>
-                          <td className="py-4 text-gray-300">
-                            {member.role}
-                          </td>
+                          <td className="py-4 text-gray-300">{member.role}</td>
                           <td className="py-4">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
                               {member.capacity} tasks
                             </span>
                           </td>
                           <td className="py-4">
-                            <button 
-                              onClick={() => handleDeleteMember(member._id, member.name)}
+                            <button
+                              onClick={() =>
+                                handleDeleteMember(member._id, member.name)
+                              }
                               className="text-red-400 hover:text-red-300 transition-colors"
                             >
                               <Trash2 size={18} />

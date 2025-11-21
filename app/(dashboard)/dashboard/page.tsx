@@ -4,14 +4,9 @@ import { useEffect, useState } from 'react';
 import { ArrowRightLeft, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 
-interface DashboardData {
-  totalProjects: number;
-  totalTasks: number;
-  completedTasks: number;
-  openTasks: number;
-  recentLogs: any[];
-  memberStats: any[];
-}
+import { DashboardData } from '@/app/types';
+
+// Local interfaces removed in favor of shared types
 
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);

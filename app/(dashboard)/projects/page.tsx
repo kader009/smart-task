@@ -5,34 +5,7 @@ import { Plus, Search, ChevronDown, Wand2 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 
-interface Project {
-  _id: string;
-  name: string;
-  description: string;
-  teamId: { _id: string; name: string } | string;
-}
-
-interface Task {
-  _id: string;
-  title: string;
-  description: string;
-  priority: 'Low' | 'Medium' | 'High';
-  status: 'Pending' | 'In Progress' | 'Done';
-  assignedTo: { _id: string; name: string } | null;
-  projectId: { _id: string; name: string } | string;
-}
-
-interface Team {
-  _id: string;
-  name: string;
-}
-
-interface Member {
-  _id: string;
-  name: string;
-  capacity: number;
-  currentTasks?: number;
-}
+import { Project, Task, Team, Member } from '@/app/types';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
