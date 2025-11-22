@@ -53,16 +53,22 @@ export default function CreateTaskModal({
               Assign Member
             </label>
             <select
-              className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="block w-full rounded-lg border border-gray-700/50 bg-gray-900/90 text-white px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-gray-600 cursor-pointer"
               value={newTask.assignedTo}
               onChange={(e) => {
                 setNewTask({ ...newTask, assignedTo: e.target.value });
                 checkCapacity(e.target.value);
               }}
             >
-              <option value="">Select a member</option>
+              <option value="" className="bg-gray-900 text-white">
+                Select a member
+              </option>
               {members.map((member) => (
-                <option key={member._id} value={member._id}>
+                <option
+                  key={member._id}
+                  value={member._id}
+                  className="bg-gray-900 text-white"
+                >
                   {member.name} (Tasks: {member.currentTasks || 0} / Cap:{' '}
                   {member.capacity})
                 </option>
