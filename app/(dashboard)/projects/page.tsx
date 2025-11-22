@@ -21,6 +21,7 @@ import CreateTaskModal from '@/app/components/projects/CreateTaskModal';
 import EditTaskModal from '@/app/components/projects/EditTaskModal';
 import TaskTable from '@/app/components/projects/TaskTable';
 import TaskFilters from '@/app/components/projects/TaskFilters';
+import ProjectDropdown from '@/app/components/projects/ProjectDropdown';
 import Skeleton from '@/app/components/ui/Skeleton';
 export default function ProjectsPage() {
   const dispatch = useAppDispatch();
@@ -239,24 +240,11 @@ export default function ProjectsPage() {
             {projects.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-gray-400 text-sm">Project:</span>
-                <select
-                  value={selectedProject?._id || ''}
-                  onChange={(e) => {
-                    const proj = projects.find((p) => p._id === e.target.value);
-                    if (proj) dispatch(setSelectedProject(proj));
-                  }}
-                  className="bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 text-white text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-gray-600 block p-2 hover:bg-gray-800/90 transition-colors cursor-pointer"
-                >
-                  {projects.map((p) => (
-                    <option
-                      key={p._id}
-                      value={p._id}
-                      className="bg-gray-900 text-white"
-                    >
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                <ProjectDropdown
+                  projects={projects}
+                  selectedProject={selectedProject}
+                  onSelectProject={(project) => dispatch(setSelectedProject(project))}
+                />
               </div>
             )}
           </div>

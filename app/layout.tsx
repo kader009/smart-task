@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Taskify',
   description: 'Manage your projects and teams efficiently',
+  icons: {
+    icon: '/icons8-project-100.png',
+  },
 };
 
 export default function RootLayout({
