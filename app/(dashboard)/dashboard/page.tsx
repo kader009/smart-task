@@ -3,30 +3,23 @@
 import { useEffect, useState } from 'react';
 import { ArrowRightLeft, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
+import { toast } from 'sonner';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  fetchDashboardData,
+  reassignTasks,
+} from '@/store/slices/dashboardSlice';
 
 import { DashboardData } from '@/app/types';
 
-// Local interfaces removed in favor of shared types
-
 export default function DashboardPage() {
-  const [data, setData] = useState<DashboardData | null>(null);
+  const dispatch = useAppDispatch();
+  const { data } = useAppSelector((state) => state.dashboard);
   const [reassigning, setReassigning] = useState(false);
 
-  const fetchData = async () => {
-    try {
-      const res = await fetch('/api/dashboard');
-      if (res.ok) {
-        const json = await res.json();
-        setData(json);
-      }
-    } catch (error) {
-      console.error('Failed to fetch dashboard data', error);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-  }, []);
+    dispatch(fetchDashboardData());
+  }, [dispatch]);
 
   const handleReassign = async () => {
     if (!data?.memberStats?.length) return;
@@ -35,18 +28,11 @@ export default function DashboardPage() {
 
     setReassigning(true);
     try {
-      const res = await fetch('/api/tasks/reassign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ teamId }),
-      });
-      if (res.ok) {
-        await fetchData(); // Refresh data
-        // You might want to use a toast here instead of alert
-        // alert('Tasks reassigned successfully!');
-      }
+      await dispatch(reassignTasks(teamId)).unwrap();
+      dispatch(fetchDashboardData()); // Refresh data
+      toast.success('Tasks reassigned successfully!');
     } catch (error) {
-      console.error('Reassign failed', error);
+      toast.error('Reassign failed');
     } finally {
       setReassigning(false);
     }

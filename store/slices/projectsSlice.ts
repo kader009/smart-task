@@ -126,6 +126,25 @@ export const deleteTask = createAsyncThunk(
   }
 );
 
+// Update task
+export const updateTask = createAsyncThunk(
+  'projects/updateTask',
+  async (task: Task, { rejectWithValue }) => {
+    try {
+      const taskId = task._id;
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(task),
+      });
+      if (!res.ok) throw new Error('Failed to update task');
+      return await res.json();
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const projectsSlice = createSlice({
   name: 'projects',
   initialState,
@@ -178,6 +197,15 @@ const projectsSlice = createSlice({
       // Delete task
       .addCase(deleteTask.fulfilled, (state, action) => {
         state.tasks = state.tasks.filter((task) => task._id !== action.payload);
+      })
+      // Update task
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const index = state.tasks.findIndex(
+          (t) => t._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.tasks[index] = action.payload;
+        }
       });
   },
 });

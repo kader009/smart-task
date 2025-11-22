@@ -102,6 +102,25 @@ export const addMember = createAsyncThunk(
   }
 );
 
+// Delete member
+export const deleteMember = createAsyncThunk(
+  'teams/deleteMember',
+  async (
+    { teamId, memberId }: { teamId: string; memberId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const res = await fetch(`/api/teams/${teamId}/members/${memberId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error('Failed to delete member');
+      return memberId;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const teamsSlice = createSlice({
   name: 'teams',
   initialState,
@@ -150,6 +169,10 @@ const teamsSlice = createSlice({
       // Add member
       .addCase(addMember.fulfilled, (state, action) => {
         state.members.push(action.payload);
+      })
+      // Delete member
+      .addCase(deleteMember.fulfilled, (state, action) => {
+        state.members = state.members.filter((m) => m._id !== action.payload);
       });
   },
 });

@@ -3,13 +3,21 @@
 import { useState, useEffect } from 'react';
 import { Plus, UserPlus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-import { Team, Member } from '@/app/types';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  fetchTeams,
+  fetchMembers,
+  createTeam,
+  addMember,
+  deleteMember,
+  setSelectedTeam,
+} from '@/store/slices/teamsSlice';
 
 export default function TeamsPage() {
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [members, setMembers] = useState<Member[]>([]);
+  const dispatch = useAppDispatch();
+  const { teams, selectedTeam, members } = useAppSelector(
+    (state) => state.teams
+  );
 
   // Forms
   const [newTeamName, setNewTeamName] = useState('');
@@ -22,71 +30,24 @@ export default function TeamsPage() {
   const [showMemberModal, setShowMemberModal] = useState(false);
 
   useEffect(() => {
-    fetchTeams();
-  }, []);
+    dispatch(fetchTeams());
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedTeam) {
-      fetchMembers(selectedTeam._id);
-    } else {
-      setMembers([]);
+      dispatch(fetchMembers(selectedTeam._id));
     }
-  }, [selectedTeam]);
-
-  const fetchTeams = async () => {
-    try {
-      const res = await fetch('/api/teams');
-      if (res.ok) {
-        const data = await res.json();
-        setTeams(data);
-        if (data.length > 0 && !selectedTeam) {
-          setSelectedTeam(data[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch teams', error);
-    }
-  };
-
-  const fetchMembers = async (teamId: string) => {
-    try {
-      const res = await fetch(`/api/teams/${teamId}/members`);
-      if (res.ok) {
-        const data = await res.json();
-        setMembers(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch members', error);
-    }
-  };
+  }, [selectedTeam, dispatch]);
 
   const handleCreateTeam = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newTeamName }),
-      });
-      if (res.ok) {
-        const team = await res.json();
-        setTeams([...teams, team]);
-        setSelectedTeam(team);
-        setNewTeamName('');
-        setShowTeamModal(false);
-        toast.success('Team created successfully!', {
-          description: `${team.name} has been created.`,
-        });
-      } else {
-        toast.error('Failed to create team', {
-          description: 'Please try again later.',
-        });
-      }
+      await dispatch(createTeam(newTeamName)).unwrap();
+      setNewTeamName('');
+      setShowTeamModal(false);
+      toast.success('Team created successfully!');
     } catch (error) {
-      console.error('Failed to create team', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to create team.',
-      });
+      toast.error('Failed to create team');
     }
   };
 
@@ -95,29 +56,17 @@ export default function TeamsPage() {
     if (!selectedTeam) return;
 
     try {
-      const res = await fetch(`/api/teams/${selectedTeam._id}/members`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMember),
-      });
-      if (res.ok) {
-        const member = await res.json();
-        setMembers([...members, member]);
-        setNewMember({ name: '', role: '', capacity: 5 });
-        setShowMemberModal(false);
-        toast.success('Member added successfully!', {
-          description: `${member.name} has been added to the team.`,
-        });
-      } else {
-        toast.error('Failed to add member', {
-          description: 'Please try again later.',
-        });
-      }
+      await dispatch(
+        addMember({
+          teamId: selectedTeam._id,
+          member: newMember,
+        })
+      ).unwrap();
+      setNewMember({ name: '', role: '', capacity: 5 });
+      setShowMemberModal(false);
+      toast.success('Member added successfully!');
     } catch (error) {
-      console.error('Failed to add member', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to add member.',
-      });
+      toast.error('Failed to add member');
     }
   };
 
@@ -125,28 +74,12 @@ export default function TeamsPage() {
     if (!selectedTeam) return;
 
     try {
-      const res = await fetch(
-        `/api/teams/${selectedTeam._id}/members/${memberId}`,
-        {
-          method: 'DELETE',
-        }
-      );
-
-      if (res.ok) {
-        setMembers(members.filter((m) => m._id !== memberId));
-        toast.success('Member removed successfully!', {
-          description: `${memberName} has been removed from the team.`,
-        });
-      } else {
-        toast.error('Failed to remove member', {
-          description: 'Please try again later.',
-        });
-      }
+      await dispatch(
+        deleteMember({ teamId: selectedTeam._id, memberId })
+      ).unwrap();
+      toast.success('Member removed successfully!');
     } catch (error) {
-      console.error('Failed to delete member', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to remove member.',
-      });
+      toast.error('Failed to remove member');
     }
   };
 
@@ -170,7 +103,7 @@ export default function TeamsPage() {
           {teams.map((team) => (
             <button
               key={team._id}
-              onClick={() => setSelectedTeam(team)}
+              onClick={() => dispatch(setSelectedTeam(team))}
               className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
                 selectedTeam?._id === team._id
                   ? 'bg-indigo-500/30 backdrop-blur-xl text-white border border-indigo-500/50 shadow-lg'

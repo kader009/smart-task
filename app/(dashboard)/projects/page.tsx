@@ -3,6 +3,16 @@
 import { useState, useEffect } from 'react';
 import { Plus, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import {
+  fetchProjects,
+  fetchTasks,
+  createProject,
+  createTask,
+  updateTask,
+  setSelectedProject,
+} from '@/store/slices/projectsSlice';
+import { fetchTeams, fetchMembers } from '@/store/slices/teamsSlice';
 
 import { Project, Task, Team, Member } from '@/app/types';
 import CreateProjectModal from '@/app/components/projects/CreateProjectModal';
@@ -12,11 +22,11 @@ import TaskTable from '@/app/components/projects/TaskTable';
 import TaskFilters from '@/app/components/projects/TaskFilters';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [teams, setTeams] = useState<Team[]>([]);
-  const [members, setMembers] = useState<Member[]>([]);
+  const dispatch = useAppDispatch();
+  const { projects, selectedProject, tasks } = useAppSelector(
+    (state) => state.projects
+  );
+  const { teams, members } = useAppSelector((state) => state.teams);
 
   // Forms
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -48,97 +58,30 @@ export default function ProjectsPage() {
   const [capacityWarning, setCapacityWarning] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchProjects();
-    fetchTeams();
-  }, []);
+    dispatch(fetchProjects());
+    dispatch(fetchTeams());
+  }, [dispatch]);
 
   useEffect(() => {
     if (selectedProject) {
-      fetchTasks(selectedProject._id);
+      dispatch(fetchTasks(selectedProject._id));
       const teamId =
         typeof selectedProject.teamId === 'object'
           ? selectedProject.teamId._id
           : selectedProject.teamId;
-      fetchMembers(teamId);
-    } else {
-      setTasks([]);
-      setMembers([]);
+      dispatch(fetchMembers(teamId));
     }
-  }, [selectedProject]);
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch('/api/projects');
-      if (res.ok) {
-        const data = await res.json();
-        setProjects(data);
-        if (data.length > 0 && !selectedProject) {
-          setSelectedProject(data[0]);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch projects', error);
-    }
-  };
-
-  const fetchTeams = async () => {
-    const res = await fetch('/api/teams');
-    if (res.ok) setTeams(await res.json());
-  };
-
-  const fetchTasks = async (projectId: string) => {
-    const res = await fetch(`/api/tasks?projectId=${projectId}`);
-    if (res.ok) {
-      const tasksData = await res.json();
-      console.log('=== FETCHED TASKS DEBUG ===');
-      console.log('Tasks count:', tasksData.length);
-      console.log('Full tasks data:', tasksData);
-      if (tasksData.length > 0) {
-        console.log('First task:', tasksData[0]);
-        console.log('First task _id:', tasksData[0]._id);
-        console.log('First task _id type:', typeof tasksData[0]._id);
-        console.log('First task keys:', Object.keys(tasksData[0]));
-      }
-      console.log('=========================');
-      setTasks(tasksData);
-    }
-  };
-
-  const fetchMembers = async (teamId: string) => {
-    const res = await fetch(`/api/teams/${teamId}/members`);
-    if (res.ok) {
-      const data = await res.json();
-      setMembers(data);
-    }
-  };
+  }, [selectedProject, dispatch]);
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch('/api/projects', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProject),
-      });
-      if (res.ok) {
-        const project = await res.json();
-        setProjects([...projects, project]);
-        setSelectedProject(project);
-        setShowProjectModal(false);
-        setNewProject({ name: '', description: '', teamId: '' });
-        toast.success('Project created successfully!', {
-          description: `${project.name} has been added to your projects.`,
-        });
-      } else {
-        toast.error('Failed to create project', {
-          description: 'Please try again later.',
-        });
-      }
+      await dispatch(createProject(newProject)).unwrap();
+      setShowProjectModal(false);
+      setNewProject({ name: '', description: '', teamId: '' });
+      toast.success('Project created successfully!');
     } catch (error) {
-      console.error('Failed to create project', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to create project.',
-      });
+      toast.error('Failed to create project');
     }
   };
 
@@ -147,47 +90,29 @@ export default function ProjectsPage() {
     if (!selectedProject) return;
 
     try {
-      const res = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await dispatch(
+        createTask({
           ...newTask,
           projectId: selectedProject._id,
           assignedTo: newTask.assignedTo || null,
-        }),
+        })
+      ).unwrap();
+      setShowTaskModal(false);
+      setNewTask({
+        title: '',
+        description: '',
+        priority: 'Low',
+        status: 'Pending',
+        assignedTo: '',
       });
-      if (res.ok) {
-        const task = await res.json();
-        setTasks([...tasks, task]);
-        setShowTaskModal(false);
-        setNewTask({
-          title: '',
-          description: '',
-          priority: 'Low',
-          status: 'Pending',
-          assignedTo: '',
-        });
-        setCapacityWarning(null);
-        toast.success('Task created successfully!', {
-          description: `${task.title} has been added to the project.`,
-        });
-      } else {
-        toast.error('Failed to create task', {
-          description: 'Please try again later.',
-        });
-      }
+      setCapacityWarning(null);
+      toast.success('Task created successfully!');
     } catch (error) {
-      console.error('Failed to create task', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to create task.',
-      });
+      toast.error('Failed to create task');
     }
   };
 
   const handleEditTask = (task: Task) => {
-    console.log('Editing task:', task);
-    console.log('Task _id:', task._id);
-    console.log('Task _id type:', typeof task._id);
     setEditingTask(task);
     setShowEditTaskModal(true);
   };
@@ -196,62 +121,29 @@ export default function ProjectsPage() {
     e.preventDefault();
     if (!editingTask) return;
 
-    // Get the task ID - handle both _id and id fields
     const taskId = editingTask._id || (editingTask as any).id;
-
     if (!taskId) {
-      console.error('No task ID found!', editingTask);
-      toast.error('Invalid task', {
-        description: 'Task ID is missing.',
-      });
+      toast.error('Invalid task');
       return;
     }
 
     try {
       const payload = {
-        title: editingTask.title,
-        description: editingTask.description,
-        priority: editingTask.priority,
-        status: editingTask.status,
+        ...editingTask,
+        _id: taskId,
         assignedTo:
           typeof editingTask.assignedTo === 'object' && editingTask.assignedTo
             ? editingTask.assignedTo._id
             : editingTask.assignedTo,
       };
 
-      console.log('Updating task with payload:', payload);
-      console.log('Task ID:', taskId);
-
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      console.log('Response status:', res.status);
-      const responseData = await res.json();
-      console.log('Response data:', responseData);
-
-      if (res.ok) {
-        setTasks(
-          tasks.map((t) => (t._id === responseData._id ? responseData : t))
-        );
-        setShowEditTaskModal(false);
-        setEditingTask(null);
-        setCapacityWarning(null);
-        toast.success('Task updated successfully!', {
-          description: `${responseData.title} has been updated.`,
-        });
-      } else {
-        toast.error('Failed to update task', {
-          description: responseData.error || 'Please try again later.',
-        });
-      }
+      await dispatch(updateTask(payload)).unwrap();
+      setShowEditTaskModal(false);
+      setEditingTask(null);
+      setCapacityWarning(null);
+      toast.success('Task updated successfully!');
     } catch (error) {
-      console.error('Failed to update task', error);
-      toast.error('Something went wrong', {
-        description: 'Unable to update task.',
-      });
+      toast.error('Failed to update task');
     }
   };
 

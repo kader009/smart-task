@@ -1,11 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-interface DashboardData {
-  totalProjects: number;
-  totalTasks: number;
-  recentLogs: any[];
-  memberStats: any[];
-}
+import { DashboardData } from '@/app/types';
 
 interface DashboardState {
   data: DashboardData | null;
