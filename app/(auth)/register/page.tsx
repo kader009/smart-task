@@ -47,6 +47,13 @@ export default function RegisterPage() {
         toast.success('Registration successful!', {
           description: 'Redirecting to login page...',
         });
+
+        // Clear input fields
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+
         setTimeout(() => {
           router.push('/login');
         }, 1500);

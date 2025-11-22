@@ -52,6 +52,11 @@ export default function LoginPage() {
         toast.success('Login successful!', {
           description: 'Redirecting to dashboard...',
         });
+
+        // Clear input fields
+        setEmail('');
+        setPassword('');
+
         setTimeout(() => {
           router.push('/dashboard');
         }, 1500);
