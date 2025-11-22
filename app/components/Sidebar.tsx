@@ -73,9 +73,6 @@ export default function Sidebar() {
           <Menu size={24} />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center border border-indigo-500/30">
-            <Sparkles size={18} className="text-indigo-400" />
-          </div>
           <span className="text-lg font-bold text-white">Taskify</span>
         </div>
       </div>
@@ -102,9 +99,6 @@ export default function Sidebar() {
         {/* Logo Section */}
         <div className="p-6 border-b border-gray-700/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center border border-indigo-500/30">
-              <Sparkles size={18} className="text-indigo-400" />
-            </div>
             <div>
               <h1 className="text-xl font-bold text-white">Taskify</h1>
               <p className="text-xs text-gray-500">Project Manager</p>

@@ -12,10 +12,11 @@ import {
   deleteMember,
   setSelectedTeam,
 } from '@/store/slices/teamsSlice';
+import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function TeamsPage() {
   const dispatch = useAppDispatch();
-  const { teams, selectedTeam, members } = useAppSelector(
+  const { teams, selectedTeam, members, loading } = useAppSelector(
     (state) => state.teams
   );
 
@@ -100,29 +101,56 @@ export default function TeamsPage() {
         {/* Team List */}
         <div className="md:col-span-1 space-y-2">
           <h2 className="font-semibold text-gray-300 mb-4">Your Teams</h2>
-          {teams.map((team) => (
-            <button
-              key={team._id}
-              onClick={() => dispatch(setSelectedTeam(team))}
-              className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
-                selectedTeam?._id === team._id
-                  ? 'bg-indigo-500/30 backdrop-blur-xl text-white border border-indigo-500/50 shadow-lg'
-                  : 'bg-gray-800/30 backdrop-blur-xl text-gray-300 border border-gray-700/50 hover:bg-gray-700/40 hover:border-gray-600/50'
-              }`}
-            >
-              {team.name}
-            </button>
-          ))}
-          {teams.length === 0 && (
-            <p className="text-sm text-gray-400 italic">
-              No teams created yet.
-            </p>
+          {loading && teams.length === 0 ? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-lg" />
+            ))
+          ) : (
+            <>
+              {teams.map((team) => (
+                <button
+                  key={team._id}
+                  onClick={() => dispatch(setSelectedTeam(team))}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 ${
+                    selectedTeam?._id === team._id
+                      ? 'bg-indigo-500/30 backdrop-blur-xl text-white border border-indigo-500/50 shadow-lg'
+                      : 'bg-gray-800/30 backdrop-blur-xl text-gray-300 border border-gray-700/50 hover:bg-gray-700/40 hover:border-gray-600/50'
+                  }`}
+                >
+                  {team.name}
+                </button>
+              ))}
+              {teams.length === 0 && (
+                <p className="text-sm text-gray-400 italic">
+                  No teams created yet.
+                </p>
+              )}
+            </>
           )}
         </div>
 
         {/* Members List */}
         <div className="md:col-span-3">
-          {selectedTeam ? (
+          {loading && !selectedTeam ? (
+            <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
+              <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-8 w-32" />
+              </div>
+              <div className="p-6">
+                <div className="space-y-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-6 w-6 rounded" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : selectedTeam ? (
             <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
               <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
                 <h2 className="text-lg font-semibold text-white">
@@ -152,38 +180,61 @@ export default function TeamsPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700/50">
-                      {members.map((member) => (
-                        <tr key={member._id}>
-                          <td className="py-4 text-white font-medium">
-                            {member.name}
-                          </td>
-                          <td className="py-4 text-gray-300">{member.role}</td>
-                          <td className="py-4">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                              {member.capacity} tasks
-                            </span>
-                          </td>
-                          <td className="py-4">
-                            <button
-                              onClick={() =>
-                                handleDeleteMember(member._id, member.name)
-                              }
-                              className="text-red-400 hover:text-red-300 transition-colors"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                      {members.length === 0 && (
-                        <tr>
-                          <td
-                            colSpan={4}
-                            className="py-8 text-center text-gray-400"
-                          >
-                            No members added to this team yet.
-                          </td>
-                        </tr>
+                      {loading ? (
+                        Array.from({ length: 3 }).map((_, i) => (
+                          <tr key={i}>
+                            <td className="py-4">
+                              <Skeleton className="h-4 w-32" />
+                            </td>
+                            <td className="py-4">
+                              <Skeleton className="h-4 w-24" />
+                            </td>
+                            <td className="py-4">
+                              <Skeleton className="h-5 w-20 rounded-full" />
+                            </td>
+                            <td className="py-4">
+                              <Skeleton className="h-6 w-6 rounded" />
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <>
+                          {members.map((member) => (
+                            <tr key={member._id}>
+                              <td className="py-4 text-white font-medium">
+                                {member.name}
+                              </td>
+                              <td className="py-4 text-gray-300">
+                                {member.role}
+                              </td>
+                              <td className="py-4">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                                  {member.capacity} tasks
+                                </span>
+                              </td>
+                              <td className="py-4">
+                                <button
+                                  onClick={() =>
+                                    handleDeleteMember(member._id, member.name)
+                                  }
+                                  className="text-red-400 hover:text-red-300 transition-colors"
+                                >
+                                  <Trash2 size={18} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                          {members.length === 0 && (
+                            <tr>
+                              <td
+                                colSpan={4}
+                                className="py-8 text-center text-gray-400"
+                              >
+                                No members added to this team yet.
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       )}
                     </tbody>
                   </table>

@@ -21,10 +21,11 @@ import CreateTaskModal from '@/app/components/projects/CreateTaskModal';
 import EditTaskModal from '@/app/components/projects/EditTaskModal';
 import TaskTable from '@/app/components/projects/TaskTable';
 import TaskFilters from '@/app/components/projects/TaskFilters';
+import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function ProjectsPage() {
   const dispatch = useAppDispatch();
-  const { projects, selectedProject, tasks } = useAppSelector(
+  const { projects, selectedProject, tasks, loading } = useAppSelector(
     (state) => state.projects
   );
   const { teams, members } = useAppSelector((state) => state.teams);
@@ -297,11 +298,64 @@ export default function ProjectsPage() {
           />
 
           {/* Table */}
-          <TaskTable
-            tasks={filteredTasks}
-            onEdit={handleEditTask}
-            onDelete={handleDeleteTask}
-          />
+          {loading && tasks.length === 0 ? (
+            <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-700/50 bg-gray-800/30 backdrop-blur-xl">
+              <table className="min-w-full divide-y divide-gray-700/50">
+                <thead className="bg-gray-900/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider w-2/5">
+                      Task Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      Assigned To
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      Priority
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="relative px-6 py-3">
+                      <span className="sr-only">Actions</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700/50">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <tr key={i}>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-4 w-48" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="w-8 h-8 rounded-full" />
+                          <Skeleton className="h-4 w-24" />
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                      </td>
+                      <td className="px-6 py-4">
+                        <Skeleton className="h-5 w-20 rounded-full" />
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Skeleton className="h-6 w-6 rounded" />
+                          <Skeleton className="h-6 w-6 rounded" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <TaskTable
+              tasks={filteredTasks}
+              onEdit={handleEditTask}
+              onDelete={handleDeleteTask}
+            />
+          )}
         </div>
 
         {/* Create Project Modal */}

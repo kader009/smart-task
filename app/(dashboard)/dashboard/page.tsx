@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowRightLeft, RefreshCw, Loader2 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -9,8 +9,7 @@ import {
   fetchDashboardData,
   reassignTasks,
 } from '@/store/slices/dashboardSlice';
-
-import { DashboardData } from '@/app/types';
+import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -38,14 +37,6 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading && !data) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -56,9 +47,7 @@ export default function DashboardPage() {
     );
   }
 
-  if (!data) return null;
-
-  const overloadedMembersCount = data.memberStats.filter(
+  const overloadedMembersCount = data?.memberStats.filter(
     (m) => m.currentLoad > m.capacity
   ).length;
 
@@ -79,50 +68,65 @@ export default function DashboardPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
-            <p className="text-gray-400 text-base font-medium leading-normal">
-              Total Active Projects
-            </p>
-            <p className="text-white tracking-light text-3xl font-bold leading-tight">
-              {data.totalProjects}
-            </p>
-            <p className="text-green-400 text-base font-medium leading-normal">
-              +2 this week
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
-            <p className="text-gray-400 text-base font-medium leading-normal">
-              Total Open Tasks
-            </p>
-            <p className="text-white tracking-light text-3xl font-bold leading-tight">
-              {data.openTasks}
-            </p>
-            <p className="text-yellow-400 text-base font-medium leading-normal">
-              -5 this week
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
-            <p className="text-gray-400 text-base font-medium leading-normal">
-              Tasks Completed
-            </p>
-            <p className="text-white tracking-light text-3xl font-bold leading-tight">
-              {data.completedTasks}
-            </p>
-            <p className="text-green-400 text-base font-medium leading-normal">
-              +10 this week
-            </p>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
-            <p className="text-gray-400 text-base font-medium leading-normal">
-              Overloaded Members
-            </p>
-            <p className="text-white tracking-light text-3xl font-bold leading-tight">
-              {overloadedMembersCount}
-            </p>
-            <p className="text-yellow-400 text-base font-medium leading-normal">
-              +1 this week
-            </p>
-          </div>
+          {loading && !data ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50"
+              >
+                <Skeleton className="h-4 w-32 mb-2" />
+                <Skeleton className="h-8 w-16 mb-2" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))
+          ) : (
+            <>
+              <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+                <p className="text-gray-400 text-base font-medium leading-normal">
+                  Total Active Projects
+                </p>
+                <p className="text-white tracking-light text-3xl font-bold leading-tight">
+                  {data?.totalProjects ?? 0}
+                </p>
+                <p className="text-green-400 text-base font-medium leading-normal">
+                  +2 this week
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+                <p className="text-gray-400 text-base font-medium leading-normal">
+                  Total Open Tasks
+                </p>
+                <p className="text-white tracking-light text-3xl font-bold leading-tight">
+                  {data?.openTasks ?? 0}
+                </p>
+                <p className="text-yellow-400 text-base font-medium leading-normal">
+                  -5 this week
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+                <p className="text-gray-400 text-base font-medium leading-normal">
+                  Tasks Completed
+                </p>
+                <p className="text-white tracking-light text-3xl font-bold leading-tight">
+                  {data?.completedTasks ?? 0}
+                </p>
+                <p className="text-green-400 text-base font-medium leading-normal">
+                  +10 this week
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 rounded-xl p-6 bg-gray-800/30 backdrop-blur-xl border border-gray-700/50">
+                <p className="text-gray-400 text-base font-medium leading-normal">
+                  Overloaded Members
+                </p>
+                <p className="text-white tracking-light text-3xl font-bold leading-tight">
+                  {overloadedMembersCount ?? 0}
+                </p>
+                <p className="text-yellow-400 text-base font-medium leading-normal">
+                  +1 this week
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -134,7 +138,7 @@ export default function DashboardPage() {
               </h2>
               <button
                 onClick={handleReassign}
-                disabled={reassigning}
+                disabled={reassigning || loading}
                 className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 hover:bg-indigo-700 text-white gap-2 pl-3 text-sm font-bold leading-normal tracking-[0.015em] transition-all disabled:opacity-50"
               >
                 <RefreshCw
@@ -169,66 +173,89 @@ export default function DashboardPage() {
                   </div>
                   {/* Table Rows */}
                   <div className="space-y-2 pt-2">
-                    {data.memberStats.map((member: any, index: number) => {
-                      const loadPercentage = Math.min(
-                        (member.currentLoad / member.capacity) * 100,
-                        100
-                      );
-                      const isOverloaded = member.currentLoad > member.capacity;
-
-                      const normalColors = [
-                        'bg-blue-500',
-                        'bg-green-500',
-                        'bg-purple-500',
-                        'bg-pink-500',
-                        'bg-cyan-500',
-                        'bg-teal-500',
-                        'bg-orange-500',
-                      ];
-                      const barColor = isOverloaded
-                        ? 'bg-red-500'
-                        : normalColors[index % normalColors.length];
-
-                      return (
+                    {loading && !data ? (
+                      Array.from({ length: 5 }).map((_, i) => (
                         <div
-                          key={member._id}
-                          className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
+                          key={i}
+                          className="grid grid-cols-6 gap-4 items-center px-4 py-3"
                         >
-                          <div className="flex items-center gap-3 col-span-2">
-                            <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
-                              {member.name.charAt(0).toUpperCase()}
-                            </div>
-                            <p className="font-medium text-white truncate">
-                              {member.name}
-                            </p>
-                            {isOverloaded && (
-                              <span
-                                className="w-3 h-3 bg-red-500 rounded-full shrink-0"
-                                title="Overloaded"
-                              ></span>
-                            )}
+                          <div className="col-span-2 flex items-center gap-3">
+                            <Skeleton className="w-9 h-9 rounded-full" />
+                            <Skeleton className="h-4 w-24" />
                           </div>
                           <div className="col-span-3">
-                            <div className="w-full bg-gray-700/50 rounded-full h-2.5">
-                              <div
-                                className={clsx(
-                                  'h-2.5 rounded-full transition-all duration-500',
-                                  barColor
-                                )}
-                                style={{ width: `${loadPercentage}%` }}
-                              ></div>
-                            </div>
+                            <Skeleton className="h-2.5 w-full rounded-full" />
                           </div>
-                          <p className="text-right font-medium text-gray-400">
-                            {member.currentLoad}/{member.capacity}
-                          </p>
+                          <div className="text-right">
+                            <Skeleton className="h-4 w-8 ml-auto" />
+                          </div>
                         </div>
-                      );
-                    })}
-                    {data.memberStats.length === 0 && (
-                      <p className="text-gray-400 text-center py-4">
-                        No team members found.
-                      </p>
+                      ))
+                    ) : (
+                      <>
+                        {data?.memberStats.map((member: any, index: number) => {
+                          const loadPercentage = Math.min(
+                            (member.currentLoad / member.capacity) * 100,
+                            100
+                          );
+                          const isOverloaded =
+                            member.currentLoad > member.capacity;
+
+                          const normalColors = [
+                            'bg-blue-500',
+                            'bg-green-500',
+                            'bg-purple-500',
+                            'bg-pink-500',
+                            'bg-cyan-500',
+                            'bg-teal-500',
+                            'bg-orange-500',
+                          ];
+                          const barColor = isOverloaded
+                            ? 'bg-red-500'
+                            : normalColors[index % normalColors.length];
+
+                          return (
+                            <div
+                              key={member._id}
+                              className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
+                            >
+                              <div className="flex items-center gap-3 col-span-2">
+                                <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
+                                  {member.name.charAt(0).toUpperCase()}
+                                </div>
+                                <p className="font-medium text-white truncate">
+                                  {member.name}
+                                </p>
+                                {isOverloaded && (
+                                  <span
+                                    className="w-3 h-3 bg-red-500 rounded-full shrink-0"
+                                    title="Overloaded"
+                                  ></span>
+                                )}
+                              </div>
+                              <div className="col-span-3">
+                                <div className="w-full bg-gray-700/50 rounded-full h-2.5">
+                                  <div
+                                    className={clsx(
+                                      'h-2.5 rounded-full transition-all duration-500',
+                                      barColor
+                                    )}
+                                    style={{ width: `${loadPercentage}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                              <p className="text-right font-medium text-gray-400">
+                                {member.currentLoad}/{member.capacity}
+                              </p>
+                            </div>
+                          );
+                        })}
+                        {data?.memberStats.length === 0 && (
+                          <p className="text-gray-400 text-center py-4">
+                            No team members found.
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -254,41 +281,61 @@ export default function DashboardPage() {
                 </div>
                 {/* Table Rows */}
                 <div className="space-y-3 pt-2">
-                  {data.recentLogs.map((log: any) => (
-                    <div
-                      key={log._id}
-                      className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
-                    >
-                      <p className="font-medium text-white col-span-3 text-sm break-words">
-                        {log.message}
-                      </p>
-                      <div className="text-right text-gray-400 text-xs">
-                        <p>
-                          {new Date(log.createdAt).toLocaleTimeString(
-                            undefined,
-                            {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            }
-                          )}
-                        </p>
-                        <p className="text-gray-500">
-                          {new Date(log.createdAt).toLocaleDateString(
-                            undefined,
-                            {
-                              month: 'short',
-                              day: 'numeric',
-                            }
-                          )}
-                        </p>
+                  {loading && !data ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="grid grid-cols-4 gap-4 items-start px-4 py-2"
+                      >
+                        <div className="col-span-3">
+                          <Skeleton className="h-4 w-full mb-1" />
+                          <Skeleton className="h-4 w-2/3" />
+                        </div>
+                        <div className="text-right">
+                          <Skeleton className="h-3 w-12 ml-auto mb-1" />
+                          <Skeleton className="h-3 w-8 ml-auto" />
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {data.recentLogs.length === 0 && (
-                    <p className="text-gray-400 text-center py-4">
-                      No recent activity.
-                    </p>
+                    ))
+                  ) : (
+                    <>
+                      {data?.recentLogs.map((log: any) => (
+                        <div
+                          key={log._id}
+                          className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
+                        >
+                          <p className="font-medium text-white col-span-3 text-sm break-words">
+                            {log.message}
+                          </p>
+                          <div className="text-right text-gray-400 text-xs">
+                            <p>
+                              {new Date(log.createdAt).toLocaleTimeString(
+                                undefined,
+                                {
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                }
+                              )}
+                            </p>
+                            <p className="text-gray-500">
+                              {new Date(log.createdAt).toLocaleDateString(
+                                undefined,
+                                {
+                                  month: 'short',
+                                  day: 'numeric',
+                                }
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {data?.recentLogs.length === 0 && (
+                        <p className="text-gray-400 text-center py-4">
+                          No recent activity.
+                        </p>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
