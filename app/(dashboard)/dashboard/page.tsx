@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowRightLeft, RefreshCw } from 'lucide-react';
+import { ArrowRightLeft, RefreshCw, Loader2 } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -14,7 +14,7 @@ import { DashboardData } from '@/app/types';
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
-  const { data } = useAppSelector((state) => state.dashboard);
+  const { data, loading, error } = useAppSelector((state) => state.dashboard);
   const [reassigning, setReassigning] = useState(false);
 
   useEffect(() => {
@@ -38,15 +38,25 @@ export default function DashboardPage() {
     }
   };
 
-  if (!data) {
+  if (loading && !data) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-red-400 bg-red-500/10 border border-red-500/50 rounded-lg p-4">
-          Error loading dashboard.
+          Error loading dashboard: {error}
         </div>
       </div>
     );
   }
+
+  if (!data) return null;
 
   const overloadedMembersCount = data.memberStats.filter(
     (m) => m.currentLoad > m.capacity
@@ -156,12 +166,25 @@ export default function DashboardPage() {
                 </div>
                 {/* Table Rows */}
                 <div className="space-y-2 pt-2">
-                  {data.memberStats.map((member: any) => {
+                  {data.memberStats.map((member: any, index: number) => {
                     const loadPercentage = Math.min(
                       (member.currentLoad / member.capacity) * 100,
                       100
                     );
                     const isOverloaded = member.currentLoad > member.capacity;
+
+                    const normalColors = [
+                      'bg-blue-500',
+                      'bg-green-500',
+                      'bg-purple-500',
+                      'bg-pink-500',
+                      'bg-cyan-500',
+                      'bg-teal-500',
+                      'bg-orange-500',
+                    ];
+                    const barColor = isOverloaded
+                      ? 'bg-red-500'
+                      : normalColors[index % normalColors.length];
 
                     return (
                       <div
@@ -169,7 +192,7 @@ export default function DashboardPage() {
                         className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
                       >
                         <div className="flex items-center gap-3 col-span-2">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
+                          <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
                             {member.name.charAt(0).toUpperCase()}
                           </div>
                           <p className="font-medium text-white truncate">
@@ -177,7 +200,7 @@ export default function DashboardPage() {
                           </p>
                           {isOverloaded && (
                             <span
-                              className="w-3 h-3 bg-yellow-500 rounded-full shrink-0"
+                              className="w-3 h-3 bg-red-500 rounded-full shrink-0"
                               title="Overloaded"
                             ></span>
                           )}
@@ -187,7 +210,7 @@ export default function DashboardPage() {
                             <div
                               className={clsx(
                                 'h-2.5 rounded-full transition-all duration-500',
-                                isOverloaded ? 'bg-yellow-500' : 'bg-indigo-500'
+                                barColor
                               )}
                               style={{ width: `${loadPercentage}%` }}
                             ></div>
