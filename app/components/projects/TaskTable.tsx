@@ -27,8 +27,8 @@ export default function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
               Status
             </th>
-            <th className="relative px-6 py-3">
-              <span className="sr-only">Actions</span>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+              Actions
             </th>
           </tr>
         </thead>
@@ -79,8 +79,8 @@ export default function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
                   {task.status}
                 </span>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <div className="flex items-center justify-end gap-2">
+              <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                <div className="flex items-center justify-center gap-2">
                   <button
                     onClick={() => onEdit(task)}
                     className="p-1 text-indigo-400 hover:text-indigo-300 transition-colors hover:bg-indigo-500/10 rounded"

@@ -139,7 +139,7 @@ export default function DashboardPage() {
               <button
                 onClick={handleReassign}
                 disabled={reassigning || loading}
-                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 hover:bg-indigo-700 text-white gap-2 pl-3 text-sm font-bold leading-normal tracking-[0.015em] transition-all disabled:opacity-50"
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white gap-2 pl-3 text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all disabled:opacity-50"
               >
                 <RefreshCw
                   size={16}

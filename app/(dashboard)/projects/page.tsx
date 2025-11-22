@@ -246,10 +246,14 @@ export default function ProjectsPage() {
                     const proj = projects.find((p) => p._id === e.target.value);
                     if (proj) dispatch(setSelectedProject(proj));
                   }}
-                  className="bg-gray-800/50 border border-gray-700/50 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2"
+                  className="bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 text-white text-sm rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-600 focus:border-gray-600 block p-2 hover:bg-gray-800/90 transition-colors cursor-pointer"
                 >
                   {projects.map((p) => (
-                    <option key={p._id} value={p._id}>
+                    <option
+                      key={p._id}
+                      value={p._id}
+                      className="bg-gray-900 text-white"
+                    >
                       {p.name}
                     </option>
                   ))}
