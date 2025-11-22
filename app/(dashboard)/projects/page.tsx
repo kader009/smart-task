@@ -22,7 +22,6 @@ import EditTaskModal from '@/app/components/projects/EditTaskModal';
 import TaskTable from '@/app/components/projects/TaskTable';
 import TaskFilters from '@/app/components/projects/TaskFilters';
 import Skeleton from '@/app/components/ui/Skeleton';
-
 export default function ProjectsPage() {
   const dispatch = useAppDispatch();
   const { projects, selectedProject, tasks, loading } = useAppSelector(

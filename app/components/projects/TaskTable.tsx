@@ -38,7 +38,7 @@ export default function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
               key={task._id}
               className="hover:bg-gray-700/20 transition-colors"
             >
-              <td className="px-6 py-4 text-sm font-medium text-white">
+              <td className="px-6 py-4 text-sm font-medium text-white wrap-break-word whitespace-normal min-w-[200px]">
                 {task.title}
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
