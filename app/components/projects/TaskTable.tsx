@@ -1,8 +1,15 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Task, TaskTableProps } from '@/app/types';
+import { Trash2, Pencil } from 'lucide-react';
+import { Task } from '@/app/types';
 
-export default function TaskTable({ tasks, onEdit }: TaskTableProps) {
+interface TaskTableProps {
+  tasks: Task[];
+  onEdit: (task: Task) => void;
+  onDelete: (taskId: string) => void;
+}
+
+export default function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
   return (
     <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-gray-800/30 backdrop-blur-xl">
       <table className="min-w-full divide-y divide-gray-700/50">
@@ -37,12 +44,10 @@ export default function TaskTable({ tasks, onEdit }: TaskTableProps) {
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold text-xs">
-                    {task.assignedTo
-                      ? task.assignedTo.name.charAt(0).toUpperCase()
-                      : 'U'}
+                    {task.assignedTo?.name?.charAt(0).toUpperCase() || 'U'}
                   </div>
                   <span className="text-sm text-gray-300">
-                    {task.assignedTo ? task.assignedTo.name : 'Unassigned'}
+                    {task.assignedTo?.name || 'Unassigned'}
                   </span>
                 </div>
               </td>
@@ -75,12 +80,22 @@ export default function TaskTable({ tasks, onEdit }: TaskTableProps) {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  onClick={() => onEdit(task)}
-                  className="text-indigo-400 hover:text-indigo-300 transition-colors"
-                >
-                  Edit
-                </button>
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    onClick={() => onEdit(task)}
+                    className="p-1 text-indigo-400 hover:text-indigo-300 transition-colors hover:bg-indigo-500/10 rounded"
+                    title="Edit Task"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    onClick={() => onDelete(task._id)}
+                    className="p-1 text-red-400 hover:text-red-300 transition-colors hover:bg-red-500/10 rounded"
+                    title="Delete Task"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

@@ -63,7 +63,8 @@ export default function CreateTaskModal({
               <option value="">Select a member</option>
               {members.map((member) => (
                 <option key={member._id} value={member._id}>
-                  {member.name} (Cap: {member.capacity})
+                  {member.name} (Tasks: {member.currentTasks || 0} / Cap:{' '}
+                  {member.capacity})
                 </option>
               ))}
             </select>

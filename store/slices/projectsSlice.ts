@@ -129,7 +129,18 @@ export const deleteTask = createAsyncThunk(
 // Update task
 export const updateTask = createAsyncThunk(
   'projects/updateTask',
-  async (task: Task, { rejectWithValue }) => {
+  async (
+    task: {
+      _id: string;
+      title: string;
+      description: string;
+      priority: string;
+      status: string;
+      assignedTo: string | { _id: string; name: string } | null;
+      projectId: string | { _id: string; name: string };
+    },
+    { rejectWithValue }
+  ) => {
     try {
       const taskId = task._id;
       const res = await fetch(`/api/tasks/${taskId}`, {

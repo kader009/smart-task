@@ -10,6 +10,7 @@ import {
   createProject,
   createTask,
   updateTask,
+  deleteTask,
   setSelectedProject,
 } from '@/store/slices/projectsSlice';
 import { fetchTeams, fetchMembers } from '@/store/slices/teamsSlice';
@@ -112,6 +113,27 @@ export default function ProjectsPage() {
     }
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    toast('Are you sure you want to delete this task?', {
+      action: {
+        label: 'Delete',
+        onClick: async () => {
+          try {
+            await dispatch(deleteTask(taskId)).unwrap();
+            toast.success('Task deleted successfully');
+            setCapacityWarning(null);
+          } catch (error) {
+            toast.error('Failed to delete task');
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {},
+      },
+    });
+  };
+
   const handleEditTask = (task: Task) => {
     setEditingTask(task);
     setShowEditTaskModal(true);
@@ -197,18 +219,42 @@ export default function ProjectsPage() {
     return matchesSearch && matchesStatus && matchesPriority && matchesMember;
   });
 
+  // Calculate member stats for dropdowns
+  const enrichedMembers = members.map((m) => ({
+    ...m,
+    currentTasks: tasks.filter(
+      (t) => t.assignedTo?._id === m._id && t.status !== 'Done'
+    ).length,
+  }));
+
   return (
     <div className="p-4 lg:p-6">
       <div className="space-y-6">
         {/* Page Heading */}
         <div className="flex flex-wrap justify-between items-center gap-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             <h1 className="text-white text-3xl font-bold tracking-tight">
               Manage Tasks
             </h1>
-            <p className="text-gray-400 text-base font-normal leading-normal">
-              Add, edit, and track all project tasks from here.
-            </p>
+            {projects.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 text-sm">Project:</span>
+                <select
+                  value={selectedProject?._id || ''}
+                  onChange={(e) => {
+                    const proj = projects.find((p) => p._id === e.target.value);
+                    if (proj) dispatch(setSelectedProject(proj));
+                  }}
+                  className="bg-gray-800/50 border border-gray-700/50 text-white text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2"
+                >
+                  {projects.map((p) => (
+                    <option key={p._id} value={p._id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -251,7 +297,11 @@ export default function ProjectsPage() {
           />
 
           {/* Table */}
-          <TaskTable tasks={filteredTasks} onEdit={handleEditTask} />
+          <TaskTable
+            tasks={filteredTasks}
+            onEdit={handleEditTask}
+            onDelete={handleDeleteTask}
+          />
         </div>
 
         {/* Create Project Modal */}
@@ -274,7 +324,7 @@ export default function ProjectsPage() {
           onSubmit={handleCreateTask}
           newTask={newTask}
           setNewTask={setNewTask}
-          members={members}
+          members={enrichedMembers}
           capacityWarning={capacityWarning}
           checkCapacity={checkCapacity}
         />
@@ -291,7 +341,7 @@ export default function ProjectsPage() {
             onSubmit={handleUpdateTask}
             editingTask={editingTask}
             setEditingTask={setEditingTask}
-            members={members}
+            members={enrichedMembers}
             capacityWarning={capacityWarning}
             checkCapacity={checkCapacity}
           />
