@@ -146,87 +146,91 @@ export default function DashboardPage() {
                 </span>
               </button>
             </div>
-            <div className="bg-gray-800/30 backdrop-blur-xl p-4 rounded-xl border border-gray-700/50">
-              <div className="flex flex-col">
-                {/* Table Header */}
-                <div className="grid grid-cols-6 gap-4 px-4 py-2 border-b border-gray-700/50">
-                  <div className="col-span-2">
-                    <p className="text-sm font-semibold text-gray-400">
-                      Team Member
-                    </p>
+            <div className="bg-gray-800/30 backdrop-blur-xl p-4 rounded-xl border border-gray-700/50 overflow-hidden">
+              <div className="flex flex-col overflow-x-auto">
+                <div className="min-w-[600px]">
+                  {/* Table Header */}
+                  <div className="grid grid-cols-6 gap-4 px-4 py-2 border-b border-gray-700/50">
+                    <div className="col-span-2">
+                      <p className="text-sm font-semibold text-gray-400">
+                        Team Member
+                      </p>
+                    </div>
+                    <div className="col-span-3">
+                      <p className="text-sm font-semibold text-gray-400">
+                        Workload
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-gray-400">
+                        Tasks
+                      </p>
+                    </div>
                   </div>
-                  <div className="col-span-3">
-                    <p className="text-sm font-semibold text-gray-400">
-                      Workload
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-400">Tasks</p>
-                  </div>
-                </div>
-                {/* Table Rows */}
-                <div className="space-y-2 pt-2">
-                  {data.memberStats.map((member: any, index: number) => {
-                    const loadPercentage = Math.min(
-                      (member.currentLoad / member.capacity) * 100,
-                      100
-                    );
-                    const isOverloaded = member.currentLoad > member.capacity;
+                  {/* Table Rows */}
+                  <div className="space-y-2 pt-2">
+                    {data.memberStats.map((member: any, index: number) => {
+                      const loadPercentage = Math.min(
+                        (member.currentLoad / member.capacity) * 100,
+                        100
+                      );
+                      const isOverloaded = member.currentLoad > member.capacity;
 
-                    const normalColors = [
-                      'bg-blue-500',
-                      'bg-green-500',
-                      'bg-purple-500',
-                      'bg-pink-500',
-                      'bg-cyan-500',
-                      'bg-teal-500',
-                      'bg-orange-500',
-                    ];
-                    const barColor = isOverloaded
-                      ? 'bg-red-500'
-                      : normalColors[index % normalColors.length];
+                      const normalColors = [
+                        'bg-blue-500',
+                        'bg-green-500',
+                        'bg-purple-500',
+                        'bg-pink-500',
+                        'bg-cyan-500',
+                        'bg-teal-500',
+                        'bg-orange-500',
+                      ];
+                      const barColor = isOverloaded
+                        ? 'bg-red-500'
+                        : normalColors[index % normalColors.length];
 
-                    return (
-                      <div
-                        key={member._id}
-                        className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
-                      >
-                        <div className="flex items-center gap-3 col-span-2">
-                          <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
-                            {member.name.charAt(0).toUpperCase()}
+                      return (
+                        <div
+                          key={member._id}
+                          className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
+                        >
+                          <div className="flex items-center gap-3 col-span-2">
+                            <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
+                              {member.name.charAt(0).toUpperCase()}
+                            </div>
+                            <p className="font-medium text-white truncate">
+                              {member.name}
+                            </p>
+                            {isOverloaded && (
+                              <span
+                                className="w-3 h-3 bg-red-500 rounded-full shrink-0"
+                                title="Overloaded"
+                              ></span>
+                            )}
                           </div>
-                          <p className="font-medium text-white truncate">
-                            {member.name}
+                          <div className="col-span-3">
+                            <div className="w-full bg-gray-700/50 rounded-full h-2.5">
+                              <div
+                                className={clsx(
+                                  'h-2.5 rounded-full transition-all duration-500',
+                                  barColor
+                                )}
+                                style={{ width: `${loadPercentage}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          <p className="text-right font-medium text-gray-400">
+                            {member.currentLoad}/{member.capacity}
                           </p>
-                          {isOverloaded && (
-                            <span
-                              className="w-3 h-3 bg-red-500 rounded-full shrink-0"
-                              title="Overloaded"
-                            ></span>
-                          )}
                         </div>
-                        <div className="col-span-3">
-                          <div className="w-full bg-gray-700/50 rounded-full h-2.5">
-                            <div
-                              className={clsx(
-                                'h-2.5 rounded-full transition-all duration-500',
-                                barColor
-                              )}
-                              style={{ width: `${loadPercentage}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <p className="text-right font-medium text-gray-400">
-                          {member.currentLoad}/{member.capacity}
-                        </p>
-                      </div>
-                    );
-                  })}
-                  {data.memberStats.length === 0 && (
-                    <p className="text-gray-400 text-center py-4">
-                      No team members found.
-                    </p>
-                  )}
+                      );
+                    })}
+                    {data.memberStats.length === 0 && (
+                      <p className="text-gray-400 text-center py-4">
+                        No team members found.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

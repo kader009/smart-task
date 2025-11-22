@@ -31,7 +31,7 @@ export default function DashboardLayout({
         <Sidebar />
 
         {/* Main Content */}
-        <main className="relative z-10 flex-1 overflow-y-auto">{children}</main>
+        <main className="relative z-10 flex-1 overflow-y-auto pt-16 md:pt-0">{children}</main>
       </div>
     </ProtectedRoute>
   );

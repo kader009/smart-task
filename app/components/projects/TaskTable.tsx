@@ -11,7 +11,7 @@ interface TaskTableProps {
 
 export default function TaskTable({ tasks, onEdit, onDelete }: TaskTableProps) {
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-gray-800/30 backdrop-blur-xl">
+    <div className="overflow-x-auto overflow-hidden rounded-lg border border-gray-700/50 bg-gray-800/30 backdrop-blur-xl">
       <table className="min-w-full divide-y divide-gray-700/50">
         <thead className="bg-gray-900/50">
           <tr>

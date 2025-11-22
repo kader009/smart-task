@@ -64,18 +64,26 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Menu Toggle */}
-      <button
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-lg text-white hover:bg-gray-700/50 transition-all"
-      >
-        {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-gray-900/95 backdrop-blur-xl border-b border-gray-700/30 z-40 flex items-center px-4 gap-3">
+        <button
+          onClick={() => setIsMobileOpen(true)}
+          className="p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center border border-indigo-500/30">
+            <Sparkles size={18} className="text-indigo-400" />
+          </div>
+          <span className="text-lg font-bold text-white">Taskify</span>
+        </div>
+      </div>
 
       {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -83,7 +91,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:static inset-y-0 left-0 z-50 w-64 h-screen bg-gray-900/95 md:bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out
+          fixed md:static inset-y-0 left-0 z-[60] w-64 h-screen bg-gray-900/95 md:bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out
           ${
             isMobileOpen
               ? 'translate-x-0'
@@ -92,13 +100,22 @@ export default function Sidebar() {
         `}
       >
         {/* Logo Section */}
-        <div className="p-6 border-b border-gray-700/30">
+        <div className="p-6 border-b border-gray-700/30 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center border border-indigo-500/30">
+              <Sparkles size={18} className="text-indigo-400" />
+            </div>
             <div>
               <h1 className="text-xl font-bold text-white">Taskify</h1>
               <p className="text-xs text-gray-500">Project Manager</p>
             </div>
           </div>
+          <button
+            onClick={() => setIsMobileOpen(false)}
+            className="md:hidden p-2 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         {/* Navigation */}
