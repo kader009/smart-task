@@ -19,6 +19,9 @@ export const fetchDashboardData = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch('/api/dashboard');
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to fetch dashboard data');
       return await res.json();
     } catch (error: any) {
@@ -37,6 +40,9 @@ export const reassignTasks = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ teamId }),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to reassign tasks');
       return await res.json();
     } catch (error: any) {

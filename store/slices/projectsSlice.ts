@@ -39,6 +39,9 @@ export const fetchProjects = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch('/api/projects');
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to fetch projects');
       return await res.json();
     } catch (error: any) {
@@ -53,6 +56,9 @@ export const fetchTasks = createAsyncThunk(
   async (projectId: string, { rejectWithValue }) => {
     try {
       const res = await fetch(`/api/tasks?projectId=${projectId}`);
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to fetch tasks');
       return await res.json();
     } catch (error: any) {
@@ -74,6 +80,9 @@ export const createProject = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(project),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to create project');
       return await res.json();
     } catch (error: any) {
@@ -102,6 +111,9 @@ export const createTask = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to create task');
       return await res.json();
     } catch (error: any) {
@@ -118,6 +130,9 @@ export const deleteTask = createAsyncThunk(
       const res = await fetch(`/api/tasks?id=${taskId}`, {
         method: 'DELETE',
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to delete task');
       return taskId;
     } catch (error: any) {
@@ -148,6 +163,9 @@ export const updateTask = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(task),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to update task');
       return await res.json();
     } catch (error: any) {

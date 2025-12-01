@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppSelector } from '@/store/hooks';
 import Link from 'next/link';
-import { Layers, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function LandingPage() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
       {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900"></div>
+      <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900"></div>
 
       {/* Central glowing effect */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse"></div>
@@ -33,7 +33,7 @@ export default function LandingPage() {
         {/* Main heading */}
         <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6">
           Smart Task
-          <span className="block bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <span className="block bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Management
           </span>
         </h1>
@@ -48,7 +48,7 @@ export default function LandingPage() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/login"
-            className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105"
+            className="group flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105"
           >
             Get Started
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

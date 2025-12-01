@@ -1,10 +1,30 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import {
+  configureStore,
+  combineReducers,
+  isRejectedWithValue,
+  Middleware,
+} from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import authReducer from './slices/authSlice';
+import authReducer, { clearUser } from './slices/authSlice';
 import teamsReducer from './slices/teamsSlice';
 import projectsReducer from './slices/projectsSlice';
 import dashboardReducer from './slices/dashboardSlice';
+
+// Middleware to handle 401 errors and auto logout
+const authErrorMiddleware: Middleware = (storeAPI) => (next) => (action) => {
+  if (isRejectedWithValue(action)) {
+    const payload = action.payload as { message?: string; status?: number };
+    if (payload?.status === 401 || payload?.message === 'Unauthorized') {
+      // Clear user and redirect to login
+      storeAPI.dispatch(clearUser());
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
+  }
+  return next(action);
+};
 
 // Persist configuration
 const persistConfig = {
@@ -32,7 +52,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
-    }),
+    }).concat(authErrorMiddleware),
 });
 
 export const persistor = persistStore(store);

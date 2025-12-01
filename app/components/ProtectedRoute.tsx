@@ -38,7 +38,8 @@ export default function ProtectedRoute({
 
     checkAuth();
     // Only run once on mount
-  }, [dispatch, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Only show loading spinner on initial check, not during navigation
   if (isInitialCheck && !user) {

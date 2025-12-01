@@ -35,6 +35,9 @@ export const fetchTeams = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch('/api/teams');
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to fetch teams');
       return await res.json();
     } catch (error: any) {
@@ -49,6 +52,9 @@ export const fetchMembers = createAsyncThunk(
   async (teamId: string, { rejectWithValue }) => {
     try {
       const res = await fetch(`/api/teams/${teamId}/members`);
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to fetch members');
       return await res.json();
     } catch (error: any) {
@@ -67,6 +73,9 @@ export const createTeam = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name }),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to create team');
       return await res.json();
     } catch (error: any) {
@@ -94,6 +103,9 @@ export const addMember = createAsyncThunk(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(member),
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to add member');
       return await res.json();
     } catch (error: any) {
@@ -113,6 +125,9 @@ export const deleteMember = createAsyncThunk(
       const res = await fetch(`/api/teams/${teamId}/members/${memberId}`, {
         method: 'DELETE',
       });
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
       if (!res.ok) throw new Error('Failed to delete member');
       return memberId;
     } catch (error: any) {
