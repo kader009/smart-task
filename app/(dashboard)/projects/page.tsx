@@ -144,7 +144,7 @@ export default function ProjectsPage() {
     e.preventDefault();
     if (!editingTask) return;
 
-    const taskId = editingTask._id || (editingTask as any).id;
+    const taskId = editingTask._id;
     if (!taskId) {
       toast.error('Invalid task');
       return;
@@ -243,7 +243,9 @@ export default function ProjectsPage() {
                 <ProjectDropdown
                   projects={projects}
                   selectedProject={selectedProject}
-                  onSelectProject={(project) => dispatch(setSelectedProject(project))}
+                  onSelectProject={(project) =>
+                    dispatch(setSelectedProject(project))
+                  }
                 />
               </div>
             )}

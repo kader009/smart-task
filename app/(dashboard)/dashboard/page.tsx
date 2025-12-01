@@ -9,6 +9,10 @@ import {
   fetchDashboardData,
   reassignTasks,
 } from '@/store/slices/dashboardSlice';
+import { fetchTeams } from '@/store/slices/teamsSlice';
+import Skeleton from '@/app/components/ui/Skeleton';
+import { MemberStat, ActivityLog } from '@/app/types';
+} from '@/store/slices/dashboardSlice';
 import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function DashboardPage() {
@@ -193,7 +197,7 @@ export default function DashboardPage() {
                       ))
                     ) : (
                       <>
-                        {data?.memberStats.map((member: any, index: number) => {
+                        {data?.memberStats.map((member: MemberStat, index: number) => {
                           const loadPercentage = Math.min(
                             (member.currentLoad / member.capacity) * 100,
                             100
@@ -299,7 +303,7 @@ export default function DashboardPage() {
                     ))
                   ) : (
                     <>
-                      {data?.recentLogs.map((log: any) => (
+                      {data?.recentLogs.map((log: ActivityLog) => (
                         <div
                           key={log._id}
                           className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"

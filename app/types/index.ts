@@ -31,13 +31,26 @@ export interface Task {
   projectId: { _id: string; name: string } | string;
 }
 
+export interface ActivityLog {
+  _id: string;
+  action: string;
+  details: string;
+  teamId: string;
+  userId?: string;
+  createdAt: string;
+}
+
+export interface MemberStat extends Member {
+  currentLoad: number;
+}
+
 export interface DashboardData {
   totalProjects: number;
   totalTasks: number;
   completedTasks: number;
   openTasks: number;
-  recentLogs: any[];
-  memberStats: any[];
+  recentLogs: ActivityLog[];
+  memberStats: MemberStat[];
 }
 
 export interface CreateProjectModalProps {
@@ -68,7 +81,13 @@ export interface CreateTaskModalProps {
     status: string;
     assignedTo: string;
   };
-  setNewTask: (task: any) => void;
+  setNewTask: (task: {
+    title: string;
+    description: string;
+    priority: string;
+    status: string;
+    assignedTo: string;
+  }) => void;
   members: Member[];
   capacityWarning: string | null;
   checkCapacity: (memberId: string) => void;

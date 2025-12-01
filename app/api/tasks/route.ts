@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     });
 
     // Populate the task before returning
-    const populatedTask: any = await Task.findById(task._id)
+    const populatedTask = await Task.findById(task._id)
       .populate('assignedTo', 'name')
       .populate('projectId', 'name')
       .lean();
@@ -99,7 +99,12 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
-    let query: any = {};
+    interface TaskQuery {
+      projectId?: string | { $in: unknown[] };
+      assignedTo?: string;
+    }
+
+    const query: TaskQuery = {};
 
     if (projectId) {
       query.projectId = projectId;
@@ -133,7 +138,7 @@ export async function GET(req: Request) {
       .lean();
 
     // Ensure _id is converted to string
-    const transformedTasks = tasks.map((task: any) => ({
+    const transformedTasks = tasks.map((task) => ({
       ...task,
       _id: task._id.toString(),
       projectId: task.projectId

@@ -24,8 +24,12 @@ export const fetchDashboardData = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to fetch dashboard data');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch dashboard data';
+      return rejectWithValue(message);
     }
   }
 );
@@ -45,8 +49,10 @@ export const reassignTasks = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to reassign tasks');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to reassign tasks';
+      return rejectWithValue(message);
     }
   }
 );

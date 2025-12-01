@@ -50,7 +50,11 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
-    let query: any = {};
+    interface ProjectQuery {
+      teamId?: string | { $in: unknown[] };
+    }
+
+    const query: ProjectQuery = {};
     if (teamId) {
       // Verify team ownership if filtering by team
       const team = await Team.findOne({ _id: teamId, owner: user.userId });

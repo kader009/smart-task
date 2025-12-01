@@ -61,7 +61,7 @@ export default function EditTaskModal({
                 typeof editingTask.assignedTo === 'object' &&
                 editingTask.assignedTo
                   ? editingTask.assignedTo._id
-                  : (editingTask.assignedTo as any) || ''
+                  : (editingTask.assignedTo as string) || ''
               }
               onChange={(e) => {
                 const memberId = e.target.value;
@@ -69,7 +69,7 @@ export default function EditTaskModal({
                 setEditingTask({
                   ...editingTask,
                   assignedTo: member
-                    ? ({ _id: member._id, name: member.name } as any)
+                    ? { _id: member._id, name: member.name }
                     : null,
                 });
                 if (memberId) checkCapacity(memberId);
@@ -109,7 +109,7 @@ export default function EditTaskModal({
                   onClick={() =>
                     setEditingTask({
                       ...editingTask,
-                      priority: priority as any,
+                      priority: priority as 'Low' | 'Medium' | 'High',
                     })
                   }
                   className={clsx(
@@ -135,7 +135,7 @@ export default function EditTaskModal({
               onChange={(e) =>
                 setEditingTask({
                   ...editingTask,
-                  status: e.target.value as any,
+                  status: e.target.value as 'Pending' | 'In Progress' | 'Done',
                 })
               }
             >

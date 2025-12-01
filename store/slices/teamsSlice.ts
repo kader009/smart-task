@@ -40,8 +40,10 @@ export const fetchTeams = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to fetch teams');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch teams';
+      return rejectWithValue(message);
     }
   }
 );
@@ -57,8 +59,10 @@ export const fetchMembers = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to fetch members');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch members';
+      return rejectWithValue(message);
     }
   }
 );
@@ -78,8 +82,10 @@ export const createTeam = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to create team');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to create team';
+      return rejectWithValue(message);
     }
   }
 );
@@ -108,8 +114,10 @@ export const addMember = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to add member');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to add member';
+      return rejectWithValue(message);
     }
   }
 );
@@ -130,8 +138,10 @@ export const deleteMember = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to delete member');
       return memberId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to delete member';
+      return rejectWithValue(message);
     }
   }
 );

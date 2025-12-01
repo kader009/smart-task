@@ -29,8 +29,10 @@ export const fetchCurrentUser = createAsyncThunk(
       }
       const data = await res.json();
       return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch user';
+      return rejectWithValue(message);
     }
   }
 );
@@ -47,8 +49,9 @@ export const logout = createAsyncThunk(
         throw new Error('Logout failed');
       }
       return null;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Logout failed';
+      return rejectWithValue(message);
     }
   }
 );

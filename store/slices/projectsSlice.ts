@@ -44,8 +44,10 @@ export const fetchProjects = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to fetch projects');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch projects';
+      return rejectWithValue(message);
     }
   }
 );
@@ -61,8 +63,10 @@ export const fetchTasks = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to fetch tasks');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch tasks';
+      return rejectWithValue(message);
     }
   }
 );
@@ -85,8 +89,10 @@ export const createProject = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to create project');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to create project';
+      return rejectWithValue(message);
     }
   }
 );
@@ -116,8 +122,10 @@ export const createTask = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to create task');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to create task';
+      return rejectWithValue(message);
     }
   }
 );
@@ -135,8 +143,10 @@ export const deleteTask = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to delete task');
       return taskId;
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to delete task';
+      return rejectWithValue(message);
     }
   }
 );
@@ -168,8 +178,10 @@ export const updateTask = createAsyncThunk(
       }
       if (!res.ok) throw new Error('Failed to update task');
       return await res.json();
-    } catch (error: any) {
-      return rejectWithValue(error.message);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to update task';
+      return rejectWithValue(message);
     }
   }
 );

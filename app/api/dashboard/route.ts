@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
     await dbConnect();
 
-    let teamIds: any[] = [];
+    const teamIds: unknown[] = [];
     if (teamId) {
       const team = await Team.findOne({ _id: teamId, owner: user.userId });
       if (!team)

@@ -88,7 +88,7 @@ export async function PUT(
 
     console.log('Team verified, updating task...');
 
-    const updatedTask: any = await Task.findByIdAndUpdate(id, updateData, {
+    const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
       new: true,
     })
       .populate('assignedTo', 'name')

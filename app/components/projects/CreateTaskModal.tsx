@@ -113,7 +113,7 @@ export default function CreateTaskModal({
               className="block w-full rounded-lg border border-gray-700/50 bg-gray-700/50 text-white px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               value={newTask.status}
               onChange={(e) =>
-                setNewTask({ ...newTask, status: e.target.value as any })
+                setNewTask({ ...newTask, status: e.target.value })
               }
             >
               <option value="Pending">Pending</option>
