@@ -9,11 +9,8 @@ import {
   fetchDashboardData,
   reassignTasks,
 } from '@/store/slices/dashboardSlice';
-import { fetchTeams } from '@/store/slices/teamsSlice';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { MemberStat, ActivityLog } from '@/app/types';
-} from '@/store/slices/dashboardSlice';
-import Skeleton from '@/app/components/ui/Skeleton';
 
 export default function DashboardPage() {
   const dispatch = useAppDispatch();
@@ -28,6 +25,10 @@ export default function DashboardPage() {
     if (!data?.memberStats?.length) return;
 
     const teamId = data.memberStats[0].teamId;
+    if (!teamId) {
+      toast.error('Team ID not found');
+      return;
+    }
 
     setReassigning(true);
     try {
@@ -36,6 +37,7 @@ export default function DashboardPage() {
       toast.success('Tasks reassigned successfully!');
     } catch (error) {
       toast.error('Reassign failed');
+      console.log(error);
     } finally {
       setReassigning(false);
     }
@@ -197,63 +199,65 @@ export default function DashboardPage() {
                       ))
                     ) : (
                       <>
-                        {data?.memberStats.map((member: MemberStat, index: number) => {
-                          const loadPercentage = Math.min(
-                            (member.currentLoad / member.capacity) * 100,
-                            100
-                          );
-                          const isOverloaded =
-                            member.currentLoad > member.capacity;
+                        {data?.memberStats.map(
+                          (member: MemberStat, index: number) => {
+                            const loadPercentage = Math.min(
+                              (member.currentLoad / member.capacity) * 100,
+                              100
+                            );
+                            const isOverloaded =
+                              member.currentLoad > member.capacity;
 
-                          const normalColors = [
-                            'bg-blue-500',
-                            'bg-green-500',
-                            'bg-purple-500',
-                            'bg-pink-500',
-                            'bg-cyan-500',
-                            'bg-teal-500',
-                            'bg-orange-500',
-                          ];
-                          const barColor = isOverloaded
-                            ? 'bg-red-500'
-                            : normalColors[index % normalColors.length];
+                            const normalColors = [
+                              'bg-blue-500',
+                              'bg-green-500',
+                              'bg-purple-500',
+                              'bg-pink-500',
+                              'bg-cyan-500',
+                              'bg-teal-500',
+                              'bg-orange-500',
+                            ];
+                            const barColor = isOverloaded
+                              ? 'bg-red-500'
+                              : normalColors[index % normalColors.length];
 
-                          return (
-                            <div
-                              key={member._id}
-                              className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
-                            >
-                              <div className="flex items-center gap-3 col-span-2">
-                                <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
-                                  {member.name.charAt(0).toUpperCase()}
+                            return (
+                              <div
+                                key={member._id}
+                                className="grid grid-cols-6 gap-4 items-center px-4 py-3 rounded-lg hover:bg-gray-700/30 transition-colors"
+                              >
+                                <div className="flex items-center gap-3 col-span-2">
+                                  <div className="w-9 h-9 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg text-sm">
+                                    {member.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <p className="font-medium text-white truncate">
+                                    {member.name}
+                                  </p>
+                                  {isOverloaded && (
+                                    <span
+                                      className="w-3 h-3 bg-red-500 rounded-full shrink-0"
+                                      title="Overloaded"
+                                    ></span>
+                                  )}
                                 </div>
-                                <p className="font-medium text-white truncate">
-                                  {member.name}
+                                <div className="col-span-3">
+                                  <div className="w-full bg-gray-700/50 rounded-full h-2.5">
+                                    <div
+                                      className={clsx(
+                                        'h-2.5 rounded-full transition-all duration-500',
+                                        barColor
+                                      )}
+                                      style={{ width: `${loadPercentage}%` }}
+                                    ></div>
+                                  </div>
+                                </div>
+                                <p className="text-right font-medium text-gray-400">
+                                  {member.currentLoad}/{member.capacity}
                                 </p>
-                                {isOverloaded && (
-                                  <span
-                                    className="w-3 h-3 bg-red-500 rounded-full shrink-0"
-                                    title="Overloaded"
-                                  ></span>
-                                )}
                               </div>
-                              <div className="col-span-3">
-                                <div className="w-full bg-gray-700/50 rounded-full h-2.5">
-                                  <div
-                                    className={clsx(
-                                      'h-2.5 rounded-full transition-all duration-500',
-                                      barColor
-                                    )}
-                                    style={{ width: `${loadPercentage}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                              <p className="text-right font-medium text-gray-400">
-                                {member.currentLoad}/{member.capacity}
-                              </p>
-                            </div>
-                          );
-                        })}
+                            );
+                          }
+                        )}
                         {data?.memberStats.length === 0 && (
                           <p className="text-gray-400 text-center py-4">
                             No team members found.
@@ -308,8 +312,8 @@ export default function DashboardPage() {
                           key={log._id}
                           className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
                         >
-                          <p className="font-medium text-white col-span-3 text-sm break-words">
-                            {log.message}
+                          <p className="font-medium text-white col-span-3 text-sm break-all">
+                            {log.details}
                           </p>
                           <div className="text-right text-gray-400 text-xs">
                             <p>
