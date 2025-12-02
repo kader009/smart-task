@@ -224,9 +224,9 @@ export default function ProjectsPage() {
     <div className="p-4 lg:p-6">
       <div className="space-y-6">
         {/* Page Heading */}
-        <div className="flex flex-wrap justify-between items-center gap-4">
+        <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-col gap-2">
-            <h1 className="text-white text-3xl font-bold tracking-tight">
+            <h1 className="text-white text-2xl sm:text-3xl font-bold tracking-tight">
               Manage Tasks
             </h1>
             {projects.length > 0 && (
@@ -242,24 +242,24 @@ export default function ProjectsPage() {
               </div>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => setShowProjectModal(true)}
-              className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
+              className="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all w-full sm:w-auto sm:min-w-[120px]"
             >
               <Plus size={16} />
               <span className="truncate">New Project</span>
             </button>
             <button
               onClick={() => setShowTaskModal(true)}
-              className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
+              className="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all w-full sm:w-auto sm:min-w-[120px]"
             >
               <Plus size={16} />
               <span className="truncate">Add New Task</span>
             </button>
             <button
               onClick={handleAutoAssign}
-              className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
+              className="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all w-full sm:w-auto sm:min-w-[120px]"
             >
               <Wand2 size={16} />
               <span className="truncate">Auto-assign</span>

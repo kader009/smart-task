@@ -43,6 +43,21 @@ export default function DashboardPage() {
     }
   };
 
+  const handleClearLogs = async () => {
+    try {
+      const res = await fetch('/api/clear-logs', { method: 'DELETE' });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error);
+
+      toast.success(`Cleared ${data.deletedCount} old activity logs`);
+      dispatch(fetchDashboardData()); // Refresh dashboard
+    } catch (error) {
+      toast.error('Failed to clear logs');
+      console.log(error);
+    }
+  };
+
   if (error) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -273,9 +288,18 @@ export default function DashboardPage() {
 
           {/* Recent Reassignments (Activity Log) */}
           <div className="xl:col-span-1">
-            <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] mb-4">
-              Recent Activity
-            </h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">
+                Recent Activity
+              </h2>
+              <button
+                onClick={handleClearLogs}
+                className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+                title="Clear old activity logs"
+              >
+                Clear Logs
+              </button>
+            </div>
             <div className="bg-gray-800/30 backdrop-blur-xl p-4 rounded-xl border border-gray-700/50">
               <div className="flex flex-col">
                 {/* Table Header */}
@@ -313,7 +337,9 @@ export default function DashboardPage() {
                           className="grid grid-cols-4 gap-4 items-start px-4 py-2 hover:bg-gray-700/30 rounded-lg transition-colors"
                         >
                           <p className="font-medium text-white col-span-3 text-sm break-all">
-                            {log.details}
+                            {log.details ||
+                              log.action ||
+                              'No details available'}
                           </p>
                           <div className="text-right text-gray-400 text-xs">
                             <p>

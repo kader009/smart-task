@@ -101,8 +101,10 @@ export async function POST(req: Request) {
           // Log
           const logMessage = `Task "${task.title}" reassigned from ${overloadedMember.name} to ${targetMember.name}`;
           logs.push({
-            message: logMessage,
+            action: 'task_reassigned',
+            details: logMessage,
             teamId: teamId,
+            userId: user.userId,
           });
           reassignmentsCount++;
 

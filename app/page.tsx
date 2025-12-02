@@ -29,9 +29,9 @@ export default function LandingPage() {
       ></div>
 
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl">
+      <div className="relative z-10 text-center px-6 max-w-4xl pt-16 sm:pt-0">
         {/* Main heading */}
-        <h1 className="text-5xl sm:text-7xl font-bold tracking-tight text-white mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight text-white mb-6">
           Smart Task
           <span className="block bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Management

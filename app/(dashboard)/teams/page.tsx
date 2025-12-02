@@ -99,11 +99,13 @@ export default function TeamsPage() {
 
   return (
     <div className="space-y-6 p-4 lg:p-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Teams & Members</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-white">
+          Teams & Members
+        </h1>
         <button
           onClick={() => setShowTeamModal(true)}
-          className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
+          className="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all w-full sm:w-auto sm:min-w-[120px]"
         >
           <Plus size={16} />
           <span className="truncate">Create Team</span>
@@ -165,13 +167,13 @@ export default function TeamsPage() {
             </div>
           ) : selectedTeam ? (
             <div className="bg-gray-800/30 backdrop-blur-xl rounded-xl border border-gray-700/50 overflow-hidden shadow-xl">
-              <div className="p-6 border-b border-gray-700/50 flex justify-between items-center">
+              <div className="p-6 border-b border-gray-700/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <h2 className="text-lg font-semibold text-white">
                   Members of {selectedTeam.name}
                 </h2>
                 <button
                   onClick={() => setShowMemberModal(true)}
-                  className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
+                  className="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all w-full sm:w-auto sm:min-w-[120px]"
                 >
                   <UserPlus size={16} />
                   Add Member

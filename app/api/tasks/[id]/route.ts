@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import Project from '@/models/Project';
 import Team from '@/models/Team';
+import ActivityLog from '@/models/ActivityLog';
 import { getUserFromToken } from '@/lib/auth';
 import mongoose from 'mongoose';
 
@@ -120,6 +121,31 @@ export async function PUT(
       );
     }
 
+    // Create activity log
+    const details: string[] = [];
+    if (updateData.title) details.push(`title to "${updateData.title}"`);
+    if (updateData.status) details.push(`status to ${updateData.status}`);
+    if (updateData.priority) details.push(`priority to ${updateData.priority}`);
+    if (updateData.assignedTo !== undefined) {
+      if (updateData.assignedTo === null) {
+        details.push('removed assignment');
+      } else if (
+        typeof updatedTask.assignedTo === 'object' &&
+        updatedTask.assignedTo?.name
+      ) {
+        details.push(`assigned to ${updatedTask.assignedTo.name}`);
+      }
+    }
+
+    await ActivityLog.create({
+      action: 'task_updated',
+      details: `Updated task: ${updatedTask.title}${
+        details.length > 0 ? ` (${details.join(', ')})` : ''
+      }`,
+      teamId: project.teamId,
+      userId: user.userId,
+    });
+
     // Ensure _id is converted to string
     const transformedTask = {
       ...updatedTask,
@@ -202,6 +228,14 @@ export async function DELETE(
     if (!team) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
+
+    // Create activity log before deletion
+    await ActivityLog.create({
+      action: 'task_deleted',
+      details: `Deleted task: ${task.title}`,
+      teamId: project.teamId,
+      userId: user.userId,
+    });
 
     await Task.findByIdAndDelete(id);
     return NextResponse.json({ message: 'Task deleted' });

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Member from '@/models/Member';
 import Team from '@/models/Team';
+import ActivityLog from '@/models/ActivityLog';
 import { getUserFromToken } from '@/lib/auth';
 
 export async function POST(
@@ -32,6 +33,14 @@ export async function POST(
       role,
       capacity,
       teamId: id,
+    });
+
+    // Create activity log
+    await ActivityLog.create({
+      action: 'member_added',
+      details: `Added member: ${name} (${role})`,
+      teamId: id,
+      userId: user.userId,
     });
 
     return NextResponse.json(member, { status: 201 });

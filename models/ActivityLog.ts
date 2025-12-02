@@ -2,8 +2,10 @@ import mongoose, { Schema, model, models } from 'mongoose';
 
 const ActivityLogSchema = new Schema(
   {
-    message: { type: String, required: true },
+    action: { type: String, required: true },
+    details: { type: String, required: true },
     teamId: { type: Schema.Types.ObjectId, ref: 'Team', required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

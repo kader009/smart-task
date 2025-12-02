@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Task from '@/models/Task';
 import Project from '@/models/Project';
 import Team from '@/models/Team';
+import ActivityLog from '@/models/ActivityLog';
 import { getUserFromToken } from '@/lib/auth';
 
 export async function POST(req: Request) {
@@ -96,6 +97,14 @@ export async function POST(req: Request) {
             }
           : populatedTask.assignedTo,
     };
+
+    // Create activity log
+    await ActivityLog.create({
+      action: 'task_created',
+      details: `Created task: ${title}`,
+      teamId: project.teamId,
+      userId: user.userId,
+    });
 
     console.log('Created task:', transformedTask);
     console.log('Created task _id type:', typeof transformedTask._id);

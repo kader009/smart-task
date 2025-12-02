@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Member from '@/models/Member';
 import Team from '@/models/Team';
+import ActivityLog from '@/models/ActivityLog';
 import { getUserFromToken } from '@/lib/auth';
 
 export async function DELETE(
@@ -35,6 +36,14 @@ export async function DELETE(
     if (!deletedMember) {
       return NextResponse.json({ error: 'Member not found' }, { status: 404 });
     }
+
+    // Create activity log
+    await ActivityLog.create({
+      action: 'member_removed',
+      details: `Removed member: ${deletedMember.name}`,
+      teamId: id,
+      userId: user.userId,
+    });
 
     return NextResponse.json({ message: 'Member deleted successfully' });
   } catch (error) {

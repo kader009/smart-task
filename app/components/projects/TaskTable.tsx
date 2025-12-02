@@ -1,4 +1,3 @@
-import React from 'react';
 import clsx from 'clsx';
 import { Trash2, Pencil } from 'lucide-react';
 import { Task } from '@/app/types';
