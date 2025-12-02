@@ -13,7 +13,7 @@ import {
   deleteTask,
   setSelectedProject,
 } from '@/store/slices/projectsSlice';
-import { fetchTeams, fetchMembers } from '@/store/slices/teamsSlice';
+import { fetchTeams, fetchAllMembers } from '@/store/slices/teamsSlice';
 
 import { Task } from '@/app/types';
 import CreateProjectModal from '@/app/components/projects/CreateProjectModal';
@@ -61,16 +61,12 @@ export default function ProjectsPage() {
   useEffect(() => {
     dispatch(fetchProjects());
     dispatch(fetchTeams());
+    dispatch(fetchAllMembers()); // Fetch all members from all teams
   }, [dispatch]);
 
   useEffect(() => {
     if (selectedProject) {
       dispatch(fetchTasks(selectedProject._id));
-      const teamId =
-        typeof selectedProject.teamId === 'object'
-          ? selectedProject.teamId._id
-          : selectedProject.teamId;
-      dispatch(fetchMembers(teamId));
     }
   }, [selectedProject, dispatch]);
 

@@ -67,6 +67,25 @@ export const fetchMembers = createAsyncThunk(
   }
 );
 
+// Fetch all members from all teams
+export const fetchAllMembers = createAsyncThunk(
+  'teams/fetchAllMembers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch('/api/members');
+      if (res.status === 401) {
+        return rejectWithValue({ message: 'Unauthorized', status: 401 });
+      }
+      if (!res.ok) throw new Error('Failed to fetch all members');
+      return await res.json();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to fetch all members';
+      return rejectWithValue(message);
+    }
+  }
+);
+
 // Create team
 export const createTeam = createAsyncThunk(
   'teams/createTeam',
@@ -183,6 +202,18 @@ const teamsSlice = createSlice({
         state.members = action.payload;
       })
       .addCase(fetchMembers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch all members
+      .addCase(fetchAllMembers.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAllMembers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.members = action.payload;
+      })
+      .addCase(fetchAllMembers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
