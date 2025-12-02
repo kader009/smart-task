@@ -39,10 +39,28 @@ export async function POST(req: Request) {
     });
 
     // Populate the task before returning
-    const populatedTask = await Task.findById(task._id)
+    interface PopulatedTask {
+      _id: { toString: () => string };
+      title: string;
+      description: string;
+      priority: string;
+      status: string;
+      projectId?:
+        | {
+            _id: { toString?: () => string } | string;
+            name: string;
+          }
+        | string;
+      assignedTo?: {
+        _id: { toString?: () => string } | string;
+        name: string;
+      } | null;
+    }
+
+    const populatedTask = (await Task.findById(task._id)
       .populate('assignedTo', 'name')
       .populate('projectId', 'name')
-      .lean();
+      .lean()) as PopulatedTask | null;
 
     if (!populatedTask) {
       return NextResponse.json(
@@ -55,22 +73,28 @@ export async function POST(req: Request) {
     const transformedTask = {
       ...populatedTask,
       _id: populatedTask._id.toString(),
-      projectId: populatedTask.projectId
-        ? {
-            _id:
-              populatedTask.projectId._id?.toString() ||
-              populatedTask.projectId._id,
-            name: populatedTask.projectId.name,
-          }
-        : populatedTask.projectId,
-      assignedTo: populatedTask.assignedTo
-        ? {
-            _id:
-              populatedTask.assignedTo._id?.toString() ||
-              populatedTask.assignedTo._id,
-            name: populatedTask.assignedTo.name,
-          }
-        : populatedTask.assignedTo,
+      projectId:
+        populatedTask.projectId && typeof populatedTask.projectId === 'object'
+          ? {
+              _id:
+                typeof populatedTask.projectId._id === 'object' &&
+                populatedTask.projectId._id.toString
+                  ? populatedTask.projectId._id.toString()
+                  : populatedTask.projectId._id,
+              name: populatedTask.projectId.name,
+            }
+          : populatedTask.projectId,
+      assignedTo:
+        populatedTask.assignedTo && typeof populatedTask.assignedTo === 'object'
+          ? {
+              _id:
+                typeof populatedTask.assignedTo._id === 'object' &&
+                populatedTask.assignedTo._id.toString
+                  ? populatedTask.assignedTo._id.toString()
+                  : populatedTask.assignedTo._id,
+              name: populatedTask.assignedTo.name,
+            }
+          : populatedTask.assignedTo,
     };
 
     console.log('Created task:', transformedTask);
@@ -132,27 +156,55 @@ export async function GET(req: Request) {
       query.projectId = { $in: projectIds };
     }
 
-    const tasks = await Task.find(query)
+    interface PopulatedTaskItem {
+      _id: { toString: () => string };
+      title: string;
+      description: string;
+      priority: string;
+      status: string;
+      projectId?:
+        | {
+            _id: { toString?: () => string } | string;
+            name: string;
+          }
+        | string;
+      assignedTo?: {
+        _id: { toString?: () => string } | string;
+        name: string;
+      } | null;
+    }
+
+    const tasks = (await Task.find(query)
       .populate('assignedTo', 'name')
       .populate('projectId', 'name')
-      .lean();
+      .lean()) as unknown as PopulatedTaskItem[];
 
     // Ensure _id is converted to string
     const transformedTasks = tasks.map((task) => ({
       ...task,
       _id: task._id.toString(),
-      projectId: task.projectId
-        ? {
-            _id: task.projectId._id?.toString() || task.projectId._id,
-            name: task.projectId.name,
-          }
-        : task.projectId,
-      assignedTo: task.assignedTo
-        ? {
-            _id: task.assignedTo._id?.toString() || task.assignedTo._id,
-            name: task.assignedTo.name,
-          }
-        : task.assignedTo,
+      projectId:
+        task.projectId && typeof task.projectId === 'object'
+          ? {
+              _id:
+                typeof task.projectId._id === 'object' &&
+                task.projectId._id.toString
+                  ? task.projectId._id.toString()
+                  : task.projectId._id,
+              name: task.projectId.name,
+            }
+          : task.projectId,
+      assignedTo:
+        task.assignedTo && typeof task.assignedTo === 'object'
+          ? {
+              _id:
+                typeof task.assignedTo._id === 'object' &&
+                task.assignedTo._id.toString
+                  ? task.assignedTo._id.toString()
+                  : task.assignedTo._id,
+              name: task.assignedTo.name,
+            }
+          : task.assignedTo,
     }));
 
     console.log('Fetched tasks count:', transformedTasks.length);
@@ -162,7 +214,7 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json(transformedTasks);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Internal Server Error' },
       { status: 500 }
