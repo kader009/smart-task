@@ -32,6 +32,7 @@ export default function ProtectedRoute({
           // No valid session, redirect to login
           setIsInitialCheck(false);
           router.push('/login');
+          console.log(error);
         }
       }
     };

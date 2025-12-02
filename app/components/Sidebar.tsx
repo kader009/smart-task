@@ -8,7 +8,6 @@ import {
   Users,
   FolderKanban,
   LogOut,
-  Sparkles,
   Menu,
   X,
 } from 'lucide-react';
@@ -41,6 +40,7 @@ export default function Sidebar() {
     } catch (error) {
       toast.error('Logout failed');
       setIsLoggingOut(false);
+      console.log(error);
     }
   };
 
@@ -88,7 +88,7 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:static inset-y-0 left-0 z-[60] w-64 h-screen bg-gray-900/95 md:bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out
+          fixed md:static inset-y-0 left-0 z-60 w-64 h-screen bg-gray-900/95 md:bg-gray-900/40 backdrop-blur-2xl border-r border-gray-700/30 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out
           ${
             isMobileOpen
               ? 'translate-x-0'

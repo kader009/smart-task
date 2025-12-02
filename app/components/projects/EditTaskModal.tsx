@@ -1,6 +1,5 @@
-import React from 'react';
 import clsx from 'clsx';
-import { Member, Task, EditTaskModalProps } from '@/app/types';
+import { EditTaskModalProps } from '@/app/types';
 
 export default function EditTaskModal({
   isOpen,
@@ -61,7 +60,7 @@ export default function EditTaskModal({
                 typeof editingTask.assignedTo === 'object' &&
                 editingTask.assignedTo
                   ? editingTask.assignedTo._id
-                  : (editingTask.assignedTo as string) || ''
+                  : (editingTask.assignedTo as unknown as string) || ''
               }
               onChange={(e) => {
                 const memberId = e.target.value;

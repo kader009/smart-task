@@ -15,7 +15,7 @@ import {
 } from '@/store/slices/projectsSlice';
 import { fetchTeams, fetchMembers } from '@/store/slices/teamsSlice';
 
-import { Project, Task, Team, Member } from '@/app/types';
+import { Task } from '@/app/types';
 import CreateProjectModal from '@/app/components/projects/CreateProjectModal';
 import CreateTaskModal from '@/app/components/projects/CreateTaskModal';
 import EditTaskModal from '@/app/components/projects/EditTaskModal';
@@ -52,7 +52,6 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [priorityFilter, setPriorityFilter] = useState('All');
-  const [memberFilter, setMemberFilter] = useState('All');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
 
@@ -82,7 +81,7 @@ export default function ProjectsPage() {
       setShowProjectModal(false);
       setNewProject({ name: '', description: '', teamId: '' });
       toast.success('Project created successfully!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to create project');
     }
   };
@@ -109,7 +108,7 @@ export default function ProjectsPage() {
       });
       setCapacityWarning(null);
       toast.success('Task created successfully!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to create task');
     }
   };
@@ -123,7 +122,7 @@ export default function ProjectsPage() {
             await dispatch(deleteTask(taskId)).unwrap();
             toast.success('Task deleted successfully');
             setCapacityWarning(null);
-          } catch (error) {
+          } catch {
             toast.error('Failed to delete task');
           }
         },
@@ -165,7 +164,7 @@ export default function ProjectsPage() {
       setEditingTask(null);
       setCapacityWarning(null);
       toast.success('Task updated successfully!');
-    } catch (error) {
+    } catch {
       toast.error('Failed to update task');
     }
   };
@@ -214,10 +213,7 @@ export default function ProjectsPage() {
       statusFilter === 'All' || task.status === statusFilter;
     const matchesPriority =
       priorityFilter === 'All' || task.priority === priorityFilter;
-    const matchesMember =
-      memberFilter === 'All' ||
-      (task.assignedTo && task.assignedTo._id === memberFilter);
-    return matchesSearch && matchesStatus && matchesPriority && matchesMember;
+    return matchesSearch && matchesStatus && matchesPriority;
   });
 
   // Calculate member stats for dropdowns

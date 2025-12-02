@@ -17,7 +17,7 @@ export default function TaskFilters({
   return (
     <div className="flex flex-col sm:flex-row gap-4 mb-4">
       {/* SearchBar */}
-      <div className="flex-grow">
+      <div className="grow">
         <div className="flex w-full h-12 rounded-lg overflow-hidden">
           <div className="flex items-center justify-center px-4 bg-gray-800/50 backdrop-blur-sm border border-r-0 border-gray-700/50 text-gray-400">
             <Search size={20} />
