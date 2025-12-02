@@ -88,12 +88,30 @@ export async function PUT(
 
     console.log('Team verified, updating task...');
 
-    const updatedTask = await Task.findByIdAndUpdate(id, updateData, {
+    interface PopulatedTask {
+      _id: { toString: () => string };
+      title: string;
+      description: string;
+      priority: string;
+      status: string;
+      projectId?:
+        | {
+            _id: { toString?: () => string } | string;
+            name: string;
+          }
+        | string;
+      assignedTo?: {
+        _id: { toString?: () => string } | string;
+        name: string;
+      } | null;
+    }
+
+    const updatedTask = (await Task.findByIdAndUpdate(id, updateData, {
       new: true,
     })
       .populate('assignedTo', 'name')
       .populate('projectId', 'name')
-      .lean();
+      .lean()) as PopulatedTask | null;
 
     if (!updatedTask) {
       return NextResponse.json(
@@ -106,22 +124,28 @@ export async function PUT(
     const transformedTask = {
       ...updatedTask,
       _id: updatedTask._id.toString(),
-      projectId: updatedTask.projectId
-        ? {
-            _id:
-              updatedTask.projectId._id?.toString() ||
-              updatedTask.projectId._id,
-            name: updatedTask.projectId.name,
-          }
-        : updatedTask.projectId,
-      assignedTo: updatedTask.assignedTo
-        ? {
-            _id:
-              updatedTask.assignedTo._id?.toString() ||
-              updatedTask.assignedTo._id,
-            name: updatedTask.assignedTo.name,
-          }
-        : updatedTask.assignedTo,
+      projectId:
+        updatedTask.projectId && typeof updatedTask.projectId === 'object'
+          ? {
+              _id:
+                typeof updatedTask.projectId._id === 'object' &&
+                updatedTask.projectId._id.toString
+                  ? updatedTask.projectId._id.toString()
+                  : updatedTask.projectId._id,
+              name: updatedTask.projectId.name,
+            }
+          : updatedTask.projectId,
+      assignedTo:
+        updatedTask.assignedTo && typeof updatedTask.assignedTo === 'object'
+          ? {
+              _id:
+                typeof updatedTask.assignedTo._id === 'object' &&
+                updatedTask.assignedTo._id.toString
+                  ? updatedTask.assignedTo._id.toString()
+                  : updatedTask.assignedTo._id,
+              name: updatedTask.assignedTo.name,
+            }
+          : updatedTask.assignedTo,
     };
 
     console.log('Task updated successfully:', transformedTask);
