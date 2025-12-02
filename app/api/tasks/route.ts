@@ -230,3 +230,68 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const user = await getUserFromToken();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const taskId = searchParams.get('id');
+
+    if (!taskId) {
+      return NextResponse.json(
+        { error: 'Task ID is required' },
+        { status: 400 }
+      );
+    }
+
+    await dbConnect();
+
+    // Find the task and verify ownership
+    const task = await Task.findById(taskId).populate('projectId');
+    if (!task) {
+      return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+    }
+
+    // Verify project ownership (via team)
+    const project = await Project.findById(task.projectId);
+    if (!project) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    }
+
+    const team = await Team.findOne({
+      _id: project.teamId,
+      owner: user.userId,
+    });
+    if (!team) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    // Delete the task
+    await Task.findByIdAndDelete(taskId);
+
+    // Create activity log
+    await ActivityLog.create({
+      action: 'task_deleted',
+      details: `Deleted task: ${task.title}`,
+      teamId: project.teamId,
+      userId: user.userId,
+    });
+
+    console.log('Deleted task:', taskId);
+
+    return NextResponse.json(
+      { message: 'Task deleted successfully' },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Task deletion error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    );
+  }
+}
