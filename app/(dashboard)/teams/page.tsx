@@ -74,14 +74,27 @@ export default function TeamsPage() {
   const handleDeleteMember = async (memberId: string, memberName: string) => {
     if (!selectedTeam) return;
 
-    try {
-      await dispatch(
-        deleteMember({ teamId: selectedTeam._id, memberId })
-      ).unwrap();
-      toast.success('Member removed successfully!');
-    } catch (error) {
-      toast.error('Failed to remove member');
-    }
+    toast(`Are you sure you want to delete "${memberName}"?`, {
+      action: {
+        label: 'Yes',
+        onClick: async () => {
+          try {
+            await dispatch(
+              deleteMember({ teamId: selectedTeam._id, memberId })
+            ).unwrap();
+            toast.success('Member removed successfully!');
+          } catch (error) {
+            toast.error('Failed to remove member');
+          }
+        },
+      },
+      cancel: {
+        label: 'No',
+        onClick: () => {
+          // Do nothing, just close the toast
+        },
+      },
+    });
   };
 
   return (
@@ -158,7 +171,7 @@ export default function TeamsPage() {
                 </h2>
                 <button
                   onClick={() => setShowMemberModal(true)}
-                  className="flex items-center gap-2 text-sm bg-gray-700/50 backdrop-blur-sm border border-gray-600/50 px-3 py-1.5 rounded-lg hover:bg-gray-600/50 transition-all duration-200 text-white"
+                  className="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white text-sm font-bold leading-normal hover:bg-gray-700/50 transition-all"
                 >
                   <UserPlus size={16} />
                   Add Member
@@ -364,7 +377,7 @@ export default function TeamsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+                  className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white rounded-lg hover:bg-gray-700/50 transition-all font-bold"
                 >
                   Add Member
                 </button>
