@@ -1,4 +1,3 @@
-import React from 'react';
 import { CreateProjectModalProps } from '@/app/types';
 
 export default function CreateProjectModal({
