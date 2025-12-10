@@ -2,7 +2,7 @@
 
 A modern, full-stack task management application built with Next.js, featuring intelligent task assignment, team collaboration, and real-time workload balancing.
 
-![Next.js](https://img.shields.io/badge/Next.js-16.0.3-black?style=flat-square&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16.0.8-black?style=flat-square&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square&logo=typescript)
 ![MongoDB](https://img.shields.io/badge/MongoDB-8.20.0-green?style=flat-square&logo=mongodb)
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.10.1-purple?style=flat-square&logo=redux)
