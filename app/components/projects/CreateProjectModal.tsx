@@ -1,5 +1,5 @@
 import React from 'react';
-import { Team, CreateProjectModalProps } from '@/app/types';
+import { CreateProjectModalProps } from '@/app/types';
 
 export default function CreateProjectModal({
   isOpen,
