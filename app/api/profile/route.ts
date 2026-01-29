@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
       if (typeof password !== 'string' || password.length < 6) {
         return NextResponse.json(
           { error: 'Password must be at least 6 characters' },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -40,7 +40,10 @@ export async function PATCH(req: Request) {
     }
 
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'No valid fields to update' },
+        { status: 400 },
+      );
     }
 
     const updated = await User.findByIdAndUpdate(user.userId, updates, {
@@ -61,7 +64,7 @@ export async function PATCH(req: Request) {
     const message = error instanceof Error ? error.message : String(error);
     return NextResponse.json(
       { error: 'Internal Server Error', details: message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

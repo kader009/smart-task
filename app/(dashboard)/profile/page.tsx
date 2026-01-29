@@ -89,60 +89,64 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="p-6 max-w-2xl">
-      <h1 className="text-white text-2xl font-bold mb-4">Profile</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="text-gray-400 block mb-1">Name</label>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
-            required
-          />
-        </div>
+    <main className="flex-1 p-6 flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-xl sm:max-w-2xl bg-gray-800/30 backdrop-blur-xl p-6 sm:p-8 rounded-xl">
+        <h1 className="text-white text-2xl font-bold mb-4 text-center sm:text-left">
+          Profile
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-gray-400 block mb-1">Name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
+              required
+            />
+          </div>
 
-        <div>
-          <label className="text-gray-400 block mb-1">Email</label>
-          <input
-            value={email}
-            readOnly
-            className="w-full bg-gray-900/30 border border-gray-700/30 rounded px-3 py-2 text-gray-400"
-          />
-        </div>
+          <div>
+            <label className="text-gray-400 block mb-1">Email</label>
+            <input
+              value={email}
+              readOnly
+              className="w-full bg-gray-900/30 border border-gray-700/30 rounded px-3 py-2 text-gray-400"
+            />
+          </div>
 
-        <div>
-          <label className="text-gray-400 block mb-1">New password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Leave blank to keep current password"
-            className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
-          />
-        </div>
+          <div>
+            <label className="text-gray-400 block mb-1">New password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Leave blank to keep current password"
+              className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
+            />
+          </div>
 
-        <div>
-          <label className="text-gray-400 block mb-1">Confirm password</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Repeat new password"
-            className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
-          />
-        </div>
+          <div>
+            <label className="text-gray-400 block mb-1">Confirm password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Repeat new password"
+              className="w-full bg-gray-800/40 border border-gray-700/50 rounded px-3 py-2 text-white"
+            />
+          </div>
 
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-4 py-2 rounded bg-indigo-600 text-white font-semibold disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save changes'}
-          </button>
-        </div>
-      </form>
+          <div className="flex gap-2 justify-end">
+            <button
+              type="submit"
+              disabled={saving}
+              className="px-4 py-2 bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 text-white rounded-lg hover:bg-gray-700/50 transition-all font-bold disabled:opacity-50"
+            >
+              {saving ? 'Saving...' : 'Save changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
   );
 }
