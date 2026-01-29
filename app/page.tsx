@@ -80,9 +80,9 @@ export default function LandingPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h2 className="text-lg font-semibold text-white mb-2">
               Project Management
-            </h3>
+            </h2>
             <p className="text-sm text-gray-400">
               Organize and track all your projects in one place
             </p>
@@ -128,9 +128,9 @@ export default function LandingPage() {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h4 className="text-lg font-semibold text-white mb-2">
               Auto Assignment
-            </h3>
+            </h4>
             <p className="text-sm text-gray-400">
               Intelligent task distribution based on workload
             </p>
