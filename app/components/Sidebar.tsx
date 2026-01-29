@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Users,
+  User,
   FolderKanban,
   LogOut,
   Menu,
@@ -49,6 +50,11 @@ export default function Sidebar() {
       name: 'Dashboard',
       href: '/dashboard',
       icon: LayoutDashboard,
+    },
+    {
+      name: 'Profile',
+      href: '/profile',
+      icon: User,
     },
     {
       name: 'Teams',
