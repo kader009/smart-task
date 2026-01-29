@@ -48,7 +48,7 @@ export default function LandingPage() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/login"
-            className="group flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg hover:shadow-indigo-500/50 transition-all duration-300 hover:scale-105"
+            className="group flex items-center gap-2 rounded-xl bg-linear-to-r from-indigo-600 to-purple-600 px-8 py-4 text-base font-semibold text-white shadow-lg hover:shadow-indigo-500/50"
           >
             Get Started
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
