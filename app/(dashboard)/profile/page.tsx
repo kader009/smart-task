@@ -80,11 +80,20 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <Skeleton className="h-6 w-48 mb-4" />
-        <Skeleton className="h-10 w-full mb-4" />
-        <Skeleton className="h-10 w-full" />
-      </div>
+      <main className="flex-1 p-6 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-xl sm:max-w-2xl bg-gray-800/30 backdrop-blur-xl p-6 sm:p-8 rounded-xl">
+          <Skeleton className="h-6 w-48 mb-6" />
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+          <div className="flex justify-end mt-6">
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+      </main>
     );
   }
 

@@ -26,7 +26,7 @@ import Skeleton from '@/app/components/ui/Skeleton';
 export default function ProjectsPage() {
   const dispatch = useAppDispatch();
   const { projects, selectedProject, tasks, loading } = useAppSelector(
-    (state) => state.projects
+    (state) => state.projects,
   );
   const { teams, members } = useAppSelector((state) => state.teams);
 
@@ -92,7 +92,7 @@ export default function ProjectsPage() {
           ...newTask,
           projectId: selectedProject._id,
           assignedTo: newTask.assignedTo || null,
-        })
+        }),
       ).unwrap();
       setShowTaskModal(false);
       setNewTask({
@@ -171,12 +171,12 @@ export default function ProjectsPage() {
 
     const currentProjectTasks = tasks.filter(
       (t) =>
-        t.assignedTo && t.assignedTo._id === memberId && t.status !== 'Done'
+        t.assignedTo && t.assignedTo._id === memberId && t.status !== 'Done',
     ).length;
 
     if (currentProjectTasks >= member.capacity) {
       setCapacityWarning(
-        `${member.name} has ${currentProjectTasks} tasks in this project (Capacity: ${member.capacity}). Assign anyway?`
+        `${member.name} has ${currentProjectTasks} tasks in this project (Capacity: ${member.capacity}). Assign anyway?`,
       );
     } else {
       setCapacityWarning(null);
@@ -187,7 +187,8 @@ export default function ProjectsPage() {
     if (members.length === 0) return;
     const memberCounts = members.map((m) => {
       const count = tasks.filter(
-        (t) => t.assignedTo && t.assignedTo._id === m._id && t.status !== 'Done'
+        (t) =>
+          t.assignedTo && t.assignedTo._id === m._id && t.status !== 'Done',
       ).length;
       return { id: m._id, count, capacity: m.capacity };
     });
@@ -216,7 +217,7 @@ export default function ProjectsPage() {
   const enrichedMembers = members.map((m) => ({
     ...m,
     currentTasks: tasks.filter(
-      (t) => t.assignedTo?._id === m._id && t.status !== 'Done'
+      (t) => t.assignedTo?._id === m._id && t.status !== 'Done',
     ).length,
   }));
 
