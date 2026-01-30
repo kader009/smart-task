@@ -130,7 +130,9 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   {fieldErrors.email && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
+                    <p className="text-red-400 text-sm mt-1">
+                      {fieldErrors.email}
+                    </p>
                   )}
                 </label>
 
@@ -147,7 +149,9 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                     {fieldErrors.password && (
-                      <p className="text-red-400 text-sm mt-1">{fieldErrors.password}</p>
+                      <p className="text-red-400 text-sm mt-1">
+                        {fieldErrors.password}
+                      </p>
                     )}
                     <button
                       type="button"

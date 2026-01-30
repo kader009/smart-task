@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Layers, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/store/hooks';
 import { registerSchema } from '@/lib/validation/auth';
@@ -126,7 +126,9 @@ export default function RegisterPage() {
                     onChange={(e) => setName(e.target.value)}
                   />
                   {fieldErrors.name && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>
+                    <p className="text-red-400 text-sm mt-1">
+                      {fieldErrors.name}
+                    </p>
                   )}
                 </label>
 
@@ -142,7 +144,9 @@ export default function RegisterPage() {
                     onChange={(e) => setEmail(e.target.value)}
                   />
                   {fieldErrors.email && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
+                    <p className="text-red-400 text-sm mt-1">
+                      {fieldErrors.email}
+                    </p>
                   )}
                 </label>
 
@@ -159,7 +163,9 @@ export default function RegisterPage() {
                       onChange={(e) => setPassword(e.target.value)}
                     />
                     {fieldErrors.password && (
-                      <p className="text-red-400 text-sm mt-1">{fieldErrors.password}</p>
+                      <p className="text-red-400 text-sm mt-1">
+                        {fieldErrors.password}
+                      </p>
                     )}
                     <button
                       type="button"
@@ -187,7 +193,9 @@ export default function RegisterPage() {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   {fieldErrors.confirmPassword && (
-                    <p className="text-red-400 text-sm mt-1">{fieldErrors.confirmPassword}</p>
+                    <p className="text-red-400 text-sm mt-1">
+                      {fieldErrors.confirmPassword}
+                    </p>
                   )}
                 </label>
 
