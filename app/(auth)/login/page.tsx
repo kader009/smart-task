@@ -46,7 +46,7 @@ export default function LoginPage() {
             id: data.userId,
             name: data.name,
             email: data.email,
-          })
+          }),
         );
 
         toast.success('Login successful!', {
@@ -69,6 +69,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError('Something went wrong');
+      console.log(err);
       toast.error('Something went wrong', {
         description: 'Please try again later',
       });
@@ -150,18 +151,31 @@ export default function LoginPage() {
                   </div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex items-center justify-center whitespace-nowrap rounded-lg bg-indigo-600 h-12 px-6 text-base font-semibold text-white transition-colors hover:bg-indigo-500 mt-6 w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                </button>
+                <div className="flex flex-col gap-3 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('kadermollarasel000@gmail.com');
+                      setPassword('78757278');
+                    }}
+                    className="w-full text-sm px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700/50 text-white hover:bg-gray-700/50 transition-colors"
+                  >
+                    Fill demo credentials
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="flex items-center justify-center whitespace-nowrap rounded-lg bg-indigo-600 h-12 px-6 text-base font-semibold text-white transition-colors hover:bg-indigo-500 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Signing in...' : 'Sign In'}
+                  </button>
+                </div>
               </form>
 
               <div className="mt-6 text-center text-sm">
                 <p className="text-[#92a4c9]">
-                  Don't have an account?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link
                     href="/register"
                     className="font-medium text-indigo-500 hover:text-indigo-400 hover:underline transition-colors"
