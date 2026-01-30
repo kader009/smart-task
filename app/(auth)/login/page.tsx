@@ -7,12 +7,14 @@ import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setUser } from '@/store/slices/authSlice';
+import { loginSchema } from '@/lib/validation/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -28,6 +30,18 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
+
+    // Validate with Zod
+    const parsed = loginSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      const errObj: Record<string, string> = {};
+      parsed.error.issues.forEach((iss) => {
+        if (iss.path && iss.path[0]) errObj[String(iss.path[0])] = iss.message;
+      });
+      setFieldErrors(errObj);
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -114,8 +128,10 @@ export default function LoginPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
+                  {fieldErrors.email && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
+                  )}
                 </label>
 
                 <label className="flex flex-col w-full">
@@ -129,8 +145,10 @@ export default function LoginPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
                     />
+                    {fieldErrors.password && (
+                      <p className="text-red-400 text-sm mt-1">{fieldErrors.password}</p>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}

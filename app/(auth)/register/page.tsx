@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Layers, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppSelector } from '@/store/hooks';
+import { registerSchema } from '@/lib/validation/auth';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const router = useRouter();
   const { user } = useAppSelector((state) => state.auth);
 
@@ -28,9 +30,21 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
+    const parsed = registerSchema.safeParse({
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!parsed.success) {
+      const errObj: Record<string, string> = {};
+      parsed.error.issues.forEach((iss) => {
+        if (iss.path && iss.path[0]) errObj[String(iss.path[0])] = iss.message;
+      });
+      setFieldErrors(errObj);
       return;
     }
 
@@ -110,8 +124,10 @@ export default function RegisterPage() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    required
                   />
+                  {fieldErrors.name && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.name}</p>
+                  )}
                 </label>
 
                 <label className="flex flex-col w-full">
@@ -124,8 +140,10 @@ export default function RegisterPage() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                   />
+                  {fieldErrors.email && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.email}</p>
+                  )}
                 </label>
 
                 <label className="flex flex-col w-full">
@@ -139,8 +157,10 @@ export default function RegisterPage() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      required
                     />
+                    {fieldErrors.password && (
+                      <p className="text-red-400 text-sm mt-1">{fieldErrors.password}</p>
+                    )}
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -165,8 +185,10 @@ export default function RegisterPage() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
                   />
+                  {fieldErrors.confirmPassword && (
+                    <p className="text-red-400 text-sm mt-1">{fieldErrors.confirmPassword}</p>
+                  )}
                 </label>
 
                 {error && (
