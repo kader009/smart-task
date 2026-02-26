@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs';
 export async function POST(req: Request) {
   try {
     await dbConnect();
-    const { name, email, password } = await req.json();
+    const { name, email, password, avatarUrl } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     if (existingUser) {
       return NextResponse.json(
         { error: 'User already exists' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,16 +25,17 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
+      avatarUrl: typeof avatarUrl === 'string' ? avatarUrl.trim() : '',
     });
 
     return NextResponse.json(
       { message: 'User created successfully', userId: user._id },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal Server Error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,7 @@ export default function RegisterPage() {
       email,
       password,
       confirmPassword,
+      avatarUrl,
     });
 
     if (!parsed.success) {
@@ -54,7 +56,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, avatarUrl }),
       });
 
       if (res.ok) {
@@ -67,6 +69,7 @@ export default function RegisterPage() {
         setEmail('');
         setPassword('');
         setConfirmPassword('');
+        setAvatarUrl('');
 
         setTimeout(() => {
           router.push('/login');
@@ -78,7 +81,7 @@ export default function RegisterPage() {
           description: data.error || 'Please try again',
         });
       }
-    } catch (err) {
+    } catch {
       setError('Something went wrong');
       toast.error('Something went wrong', {
         description: 'Please try again later',
@@ -114,6 +117,29 @@ export default function RegisterPage() {
               </p>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <label className="flex flex-col w-full">
+                  <p className="text-white text-sm font-medium leading-normal pb-2">
+                    Profile Image URL{' '}
+                    <span className="text-[#92a4c9] font-normal">
+                      (optional)
+                    </span>
+                  </p>
+                  <input
+                    className="w-full rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-[#324467] bg-[#192233] h-12 placeholder:text-[#92a4c9] px-4 text-base"
+                    placeholder="https://example.com/your-photo.jpg"
+                    type="url"
+                    value={avatarUrl}
+                    onChange={(e) => {
+                      setAvatarUrl(e.target.value);
+                    }}
+                  />
+                  {fieldErrors.avatarUrl && (
+                    <p className="text-red-400 text-sm mt-1">
+                      {fieldErrors.avatarUrl}
+                    </p>
+                  )}
+                </label>
+
                 <label className="flex flex-col w-full">
                   <p className="text-white text-sm font-medium leading-normal pb-2">
                     Username

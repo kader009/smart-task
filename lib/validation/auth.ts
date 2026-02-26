@@ -29,6 +29,14 @@ export const registerSchema = z
       (val) => (typeof val === 'string' ? val.trim() : val),
       z.string().min(1, 'Please confirm your password'),
     ),
+    avatarUrl: z.preprocess(
+      (val) => (typeof val === 'string' ? val.trim() : val),
+      z
+        .string()
+        .url('Please enter a valid image URL')
+        .or(z.literal(''))
+        .optional(),
+    ),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
