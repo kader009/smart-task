@@ -6,6 +6,13 @@ import User from '@/models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+interface LeanUser {
+  _id: unknown;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+}
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -18,7 +25,9 @@ export async function GET() {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
 
     await dbConnect();
-    const user = await User.findById(decoded.userId).select('-password');
+    const user = await User.findById(decoded.userId)
+      .select('-password')
+      .lean<LeanUser>();
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -28,7 +37,7 @@ export async function GET() {
       id: user._id,
       name: user.name,
       email: user.email,
-      avatarUrl: user.avatarUrl || '',
+      avatarUrl: user.avatarUrl ?? '',
     });
   } catch (error) {
     return NextResponse.json(

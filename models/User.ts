@@ -10,5 +10,7 @@ const UserSchema = new Schema(
   { timestamps: true },
 );
 
-const User = models.User || model('User', UserSchema);
+// Delete cached model to prevent stale schema in dev hot-reload
+delete mongoose.models.User;
+const User = model('User', UserSchema);
 export default User;

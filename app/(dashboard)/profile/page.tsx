@@ -72,8 +72,12 @@ export default function ProfilePage() {
         throw new Error(data.error || 'Update failed');
       }
 
+      // Update local state from saved response so avatar/name persist on page
+      setName(data.name || '');
+      setAvatarUrl(data.avatarUrl || '');
+      setAvatarError(false);
       toast.success('Profile updated');
-      // Refresh auth state
+      // Refresh auth state in Redux (for sidebar)
       dispatch(fetchCurrentUser());
       setPassword('');
       setConfirmPassword('');

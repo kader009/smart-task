@@ -10,6 +10,13 @@ interface UpdateProfile {
   avatarUrl?: string;
 }
 
+interface LeanUser {
+  _id: unknown;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+}
+
 export async function PATCH(req: Request) {
   try {
     const user = await getUserFromToken();
@@ -53,7 +60,9 @@ export async function PATCH(req: Request) {
 
     const updated = await User.findByIdAndUpdate(user.userId, updates, {
       new: true,
-    }).select('-password');
+    })
+      .select('-password')
+      .lean<LeanUser>();
 
     if (!updated) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -63,7 +72,7 @@ export async function PATCH(req: Request) {
       id: updated._id,
       name: updated.name,
       email: updated.email,
-      avatarUrl: updated.avatarUrl || '',
+      avatarUrl: updated.avatarUrl ?? '',
     });
   } catch (error: unknown) {
     console.error('Profile update error:', error);
