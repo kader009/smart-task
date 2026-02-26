@@ -4,6 +4,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  avatarUrl?: string;
 }
 
 interface AuthState {
@@ -34,7 +35,7 @@ export const fetchCurrentUser = createAsyncThunk(
         error instanceof Error ? error.message : 'Failed to fetch user';
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
 // Async thunk to logout
@@ -53,7 +54,7 @@ export const logout = createAsyncThunk(
       const message = error instanceof Error ? error.message : 'Logout failed';
       return rejectWithValue(message);
     }
-  }
+  },
 );
 
 const authSlice = createSlice({

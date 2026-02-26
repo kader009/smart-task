@@ -7,6 +7,7 @@ import { getUserFromToken } from '@/lib/auth';
 interface UpdateProfile {
   name?: string;
   password?: string;
+  avatarUrl?: string;
 }
 
 export async function PATCH(req: Request) {
@@ -19,12 +20,16 @@ export async function PATCH(req: Request) {
     await dbConnect();
 
     const body = (await req.json()) as UpdateProfile;
-    const { name, password } = body;
+    const { name, password, avatarUrl } = body;
 
     const updates: Partial<UpdateProfile> = {};
 
     if (name && typeof name === 'string' && name.trim().length > 0) {
       updates.name = name.trim();
+    }
+
+    if (avatarUrl !== undefined) {
+      updates.avatarUrl = typeof avatarUrl === 'string' ? avatarUrl.trim() : '';
     }
 
     if (password !== undefined) {
@@ -58,6 +63,7 @@ export async function PATCH(req: Request) {
       id: updated._id,
       name: updated.name,
       email: updated.email,
+      avatarUrl: updated.avatarUrl || '',
     });
   } catch (error: unknown) {
     console.error('Profile update error:', error);

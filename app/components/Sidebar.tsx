@@ -161,7 +161,23 @@ export default function Sidebar() {
           {user && (
             <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg">
+                {user.avatarUrl ? (
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name}
+                    className="w-10 h-10 rounded-full object-cover border border-gray-700/50 shadow-lg"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const fallback = e.currentTarget
+                        .nextElementSibling as HTMLElement | null;
+                      if (fallback) fallback.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div
+                  className="w-10 h-10 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg"
+                  style={{ display: user.avatarUrl ? 'none' : 'flex' }}
+                >
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">

@@ -28,11 +28,12 @@ export async function GET() {
       id: user._id,
       name: user.name,
       email: user.email,
+      avatarUrl: user.avatarUrl || '',
     });
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch user' },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

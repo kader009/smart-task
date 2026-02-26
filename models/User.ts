@@ -5,8 +5,9 @@ const UserSchema = new Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    avatarUrl: { type: String, default: '' },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = models.User || model('User', UserSchema);
