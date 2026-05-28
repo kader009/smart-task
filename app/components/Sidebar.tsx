@@ -23,27 +23,25 @@ export default function Sidebar() {
   const dispatch = useAppDispatch();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [avatarImgError, setAvatarImgError] = useState(false);
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | undefined>(
+    undefined,
+  );
   const [isMounted, setIsMounted] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get user data from Redux store
   const { user } = useAppSelector((state) => state.auth);
 
-  // Reset image error whenever the avatarUrl changes
-  const prevAvatarRef = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (user?.avatarUrl !== prevAvatarRef.current) {
-      prevAvatarRef.current = user?.avatarUrl;
-      setAvatarImgError(false);
-    }
-  }, [user?.avatarUrl]);
+    // Avoid synchronous state updates right on mount trigger
+    const initialTimout = setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
 
-  useEffect(() => {
-    setIsMounted(true);
     dispatch(fetchCurrentUser());
 
     return () => {
+      clearTimeout(initialTimout);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [dispatch]);
@@ -180,32 +178,36 @@ export default function Sidebar() {
         <div className="p-4 border-t border-gray-700/30">
           {!isMounted ? (
             <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30 animate-pulse h-[66px]" />
-          ) : user && (
-            <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
-              <div className="flex items-center gap-3">
-                {user.avatarUrl && !avatarImgError ? (
-                  <Image
-                    src={user.avatarUrl}
-                    alt={user.name || 'User'}
-                    width={40}
-                    height={40}
-                    unoptimized
-                    className="w-10 h-10 rounded-full object-cover border border-gray-700/50 shadow-lg shrink-0"
-                    onError={() => setAvatarImgError(true)}
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg shrink-0">
-                    {user.name?.charAt(0).toUpperCase() || 'U'}
+          ) : (
+            user && (
+              <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
+                <div className="flex items-center gap-3">
+                  {user.avatarUrl && failedAvatarUrl !== user.avatarUrl ? (
+                    <Image
+                      src={user.avatarUrl}
+                      alt={user.name || 'User'}
+                      width={40}
+                      height={40}
+                      unoptimized
+                      className="w-10 h-10 rounded-full object-cover border border-gray-700/50 shadow-lg shrink-0"
+                      onError={() => setFailedAvatarUrl(user.avatarUrl)}
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white font-semibold shadow-lg shrink-0">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </p>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
-                    {user.name}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{user.email}</p>
                 </div>
               </div>
-            </div>
+            )
           )}
 
           <button
