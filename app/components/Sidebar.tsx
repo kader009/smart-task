@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -23,6 +24,8 @@ export default function Sidebar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [avatarImgError, setAvatarImgError] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Get user data from Redux store
   const { user } = useAppSelector((state) => state.auth);
@@ -37,7 +40,12 @@ export default function Sidebar() {
   }, [user?.avatarUrl]);
 
   useEffect(() => {
+    setIsMounted(true);
     dispatch(fetchCurrentUser());
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, [dispatch]);
 
   const handleLogout = async () => {
@@ -45,7 +53,7 @@ export default function Sidebar() {
     try {
       await dispatch(logout()).unwrap();
       toast.success('Logged out successfully');
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         router.push('/login');
       }, 500);
     } catch (error) {
@@ -89,7 +97,9 @@ export default function Sidebar() {
           <Menu size={24} />
         </button>
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-white">Taskify</span>
+          <span className="text-lg font-bold text-white">
+            <Link href="/">Taskify</Link>
+          </span>
         </div>
       </div>
 
@@ -168,13 +178,18 @@ export default function Sidebar() {
 
         {/* User Section */}
         <div className="p-4 border-t border-gray-700/30">
-          {user && (
+          {!isMounted ? (
+            <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30 animate-pulse h-[66px]" />
+          ) : user && (
             <div className="mb-3 px-4 py-3 bg-gray-800/30 rounded-xl border border-gray-700/30">
               <div className="flex items-center gap-3">
                 {user.avatarUrl && !avatarImgError ? (
-                  <img
+                  <Image
                     src={user.avatarUrl}
-                    alt={user.name}
+                    alt={user.name || 'User'}
+                    width={40}
+                    height={40}
+                    unoptimized
                     className="w-10 h-10 rounded-full object-cover border border-gray-700/50 shadow-lg shrink-0"
                     onError={() => setAvatarImgError(true)}
                   />
